@@ -11,13 +11,26 @@ func checkArity(args []sexp, n int) error {
 	return nil
 }
 
-func car(x sexp) (sexp, error) {
+func car(x sexp) sexp {
 	cell, ok := x.(*cell)
 	if !ok || cell == nil {
-		return symNil, nil
+		return symNil
 	}
 
-	return cell.car, nil
+	return cell.car
+}
+
+func cdr(x sexp) sexp {
+	cell, ok := x.(*cell)
+	if !ok || cell == nil {
+		return symNil
+	}
+
+	return cell.cdr
+}
+
+func split(x sexp) (sexp, sexp) {
+	return car(x), cdr(x)
 }
 
 func lispCar(env *environment, args ...sexp) (sexp, error) {
@@ -25,16 +38,7 @@ func lispCar(env *environment, args ...sexp) (sexp, error) {
 		return nil, err
 	}
 
-	return car(args[0])
-}
-
-func cdr(x sexp) (sexp, error) {
-	cell, ok := x.(*cell)
-	if !ok || cell == nil {
-		return symNil, nil
-	}
-
-	return cell.cdr, nil
+	return car(args[0]), nil
 }
 
 func lispCdr(env *environment, args ...sexp) (sexp, error) {
@@ -42,7 +46,7 @@ func lispCdr(env *environment, args ...sexp) (sexp, error) {
 		return nil, err
 	}
 
-	return cdr(args[0])
+	return cdr(args[0]), nil
 }
 
 func cons(env *environment, args ...sexp) (sexp, error) {
@@ -86,8 +90,7 @@ func eq(env *environment, args ...sexp) (sexp, error) {
 
 func cond(env *environment, args ...sexp) (sexp, error) {
 	for i, clause := range args {
-		cond := must(car(clause))
-		body := must(cdr(clause))
+		cond, body := split(clause)
 
 		res, err := cond.Eval(env)
 		if err != nil {
@@ -95,7 +98,7 @@ func cond(env *environment, args ...sexp) (sexp, error) {
 		}
 
 		if res != symNil {
-			return must(car(body)).Eval(env)
+			return car(body).Eval(env)
 		}
 	}
 

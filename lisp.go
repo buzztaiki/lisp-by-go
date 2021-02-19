@@ -9,13 +9,6 @@ type sexp interface {
 	String() string
 }
 
-func must(x sexp, err error) sexp {
-	if err != nil {
-		panic(err)
-	}
-	return x
-}
-
 type symbol string
 
 func (sym symbol) Eval(env *environment) (sexp, error) {
@@ -60,8 +53,8 @@ func (c *cell) arguments(env *environment) []sexp {
 	rest := c.cdr
 	args := []sexp{}
 	for rest != symNil {
-		args = append(args, must(car(rest)))
-		rest = must(cdr(rest))
+		args = append(args, car(rest))
+		rest = cdr(rest)
 	}
 
 	return args

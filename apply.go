@@ -48,10 +48,11 @@ func newLambdaFunction(x sexp) *lambdaFunction {
 
 	argsAndBody, ok := x.(*cell)
 	if ok {
-		varNames, body := must(car(argsAndBody)), must(cdr(argsAndBody))
+		varNames, body := split(argsAndBody)
+
 		for varNames != symNil {
-			res.varNames = append(res.varNames, must(car(varNames)).String())
-			varNames = must(cdr(varNames))
+			res.varNames = append(res.varNames, car(varNames).String())
+			varNames = cdr(varNames)
 		}
 		res.body = body
 	}
@@ -73,5 +74,5 @@ func (fn lambdaFunction) Apply(env *environment, args []sexp) (sexp, error) {
 		newEnv.vars[fn.varNames[i]] = newArgs[i]
 	}
 
-	return must(car(fn.body)).Eval(newEnv)
+	return car(fn.body).Eval(newEnv)
 }
