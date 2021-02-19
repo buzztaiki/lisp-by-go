@@ -3,23 +3,29 @@ package main
 import "fmt"
 
 func main() {
-	sexp := &cell{
-		symbol("cons"),
-		&cell{
-			symbol("a"),
-			&cell{symbol("b"), symNil},
-		},
+	l := func(args ...sexp) sexp {
+		return must(list(args...))
 	}
-	sexp2 := sexpList(
-		symbol("cons"),
-		symbol("a"),
-		symbol("b"),
-	)
 
-	fmt.Println(sexp)
-	fmt.Println(sexp.Eval())
+	srcs := []sexp{
+		&cell{
+			symbol("cons"),
+			&cell{
+				symbol("a"),
+				&cell{symbol("b"), symNil},
+			},
+		},
+		l(
+			symbol("cons"),
+			symbol("a"),
+			l(symbol("cons"), symbol("b"), symbol("c")),
+		),
+		l(),
+	}
 
-	fmt.Println(sexp2)
-	fmt.Println(sexp2.Eval())
-	fmt.Println(sexpList().Eval())
+	for _, src := range srcs {
+		fmt.Println(src)
+		fmt.Println(src.Eval())
+		fmt.Println()
+	}
 }
