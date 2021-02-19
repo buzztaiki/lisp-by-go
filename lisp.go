@@ -54,12 +54,21 @@ func (c *cell) Eval(env *environment) (expr, error) {
 			return nil, fmt.Errorf("unknown function %v", c.car)
 		}
 
-		return fn.Apply(env, args)
+		res, err := fn.Apply(env, args)
+		if err != nil {
+			return nil, fmt.Errorf("%v: %w", x, err)
+		}
+		return res, nil
 	case *cell:
 		if x.car != symLambda {
 			return nil, fmt.Errorf("invalid function %v", c.car)
 		}
-		return newLambdaFunction(x.cdr).Apply(env, args)
+
+		res, err := newLambdaFunction(x.cdr).Apply(env, args)
+		if err != nil {
+			return nil, fmt.Errorf("lambda: %w", err)
+		}
+		return res, nil
 	}
 	return nil, fmt.Errorf("invalid function %v", c.car)
 }
