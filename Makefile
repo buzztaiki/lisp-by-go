@@ -1,2 +1,4 @@
-default:
-	go run .
+default: test
+
+test:
+	go test ./...
