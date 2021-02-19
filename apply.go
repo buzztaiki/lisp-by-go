@@ -21,7 +21,7 @@ func evalArgs(env *environment, args []sexp) ([]sexp, error) {
 	return newArgs, nil
 }
 
-type function func(env *environment, args ...sexp) (sexp, error)
+type function func(env *environment, args []sexp) (sexp, error)
 
 func (fn function) Apply(env *environment, args []sexp) (sexp, error) {
 	newArgs, err := evalArgs(env, args)
@@ -29,13 +29,13 @@ func (fn function) Apply(env *environment, args []sexp) (sexp, error) {
 		return nil, err
 	}
 
-	return fn(env, newArgs...)
+	return fn(env, newArgs)
 }
 
-type specialForm func(env *environment, args ...sexp) (sexp, error)
+type specialForm func(env *environment, args []sexp) (sexp, error)
 
 func (fn specialForm) Apply(env *environment, args []sexp) (sexp, error) {
-	return fn(env, args...)
+	return fn(env, args)
 }
 
 type lambdaFunction struct {

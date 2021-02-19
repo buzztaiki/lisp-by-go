@@ -33,7 +33,7 @@ func split(x sexp) (sexp, sexp) {
 	return car(x), cdr(x)
 }
 
-func lispCar(env *environment, args ...sexp) (sexp, error) {
+func lispCar(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func lispCar(env *environment, args ...sexp) (sexp, error) {
 	return car(args[0]), nil
 }
 
-func lispCdr(env *environment, args ...sexp) (sexp, error) {
+func lispCdr(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func lispCdr(env *environment, args ...sexp) (sexp, error) {
 	return cdr(args[0]), nil
 }
 
-func cons(env *environment, args ...sexp) (sexp, error) {
+func cons(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func cons(env *environment, args ...sexp) (sexp, error) {
 	return &cell{args[0], args[1]}, nil
 }
 
-func list(sexps []sexp) sexp {
+func list(sexps ...sexp) sexp {
 	xs := sexp(symNil)
 	for i := len(sexps) - 1; i >= 0; i-- {
 		xs = &cell{sexps[i], xs}
@@ -65,18 +65,18 @@ func list(sexps []sexp) sexp {
 	return xs
 }
 
-func lispList(env *environment, args ...sexp) (sexp, error) {
-	return list(args), nil
+func lispList(env *environment, args []sexp) (sexp, error) {
+	return list(args...), nil
 }
 
-func quote(env *environment, args ...sexp) (sexp, error) {
+func quote(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
 	return args[0], nil
 }
 
-func eq(env *environment, args ...sexp) (sexp, error) {
+func eq(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func eq(env *environment, args ...sexp) (sexp, error) {
 	return symTrue, nil
 }
 
-func cond(env *environment, args ...sexp) (sexp, error) {
+func cond(env *environment, args []sexp) (sexp, error) {
 	for i, clause := range args {
 		cond, body := split(clause)
 

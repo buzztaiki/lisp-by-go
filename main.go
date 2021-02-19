@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 	l := func(args ...sexp) sexp {
-		return list(args)
+		return list(args...)
 	}
 
 	srcs := []sexp{
