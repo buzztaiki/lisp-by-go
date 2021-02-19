@@ -13,8 +13,9 @@ func newEnvironment() *environment {
 	return &environment{
 		map[string]appliable{
 			"cons":  function(cons),
-			"car":   function(car),
-			"cdr":   function(cdr),
+			"list":  function(lispList),
+			"car":   function(lispCar),
+			"cdr":   function(lispCdr),
 			"eq":    function(eq),
 			"quote": specialForm(quote),
 			"cond":  specialForm(cond),

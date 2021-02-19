@@ -43,15 +43,15 @@ type lambdaFunction struct {
 	body     sexp
 }
 
-func newLambdaFunction(env *environment, x sexp) *lambdaFunction {
+func newLambdaFunction(x sexp) *lambdaFunction {
 	res := &lambdaFunction{[]string{}, symNil}
 
 	argsAndBody, ok := x.(*cell)
 	if ok {
-		varNames, body := must(car(env, argsAndBody)), must(cdr(env, argsAndBody))
+		varNames, body := must(car(argsAndBody)), must(cdr(argsAndBody))
 		for varNames != symNil {
-			res.varNames = append(res.varNames, must(car(env, varNames)).String())
-			varNames = must(cdr(env, varNames))
+			res.varNames = append(res.varNames, must(car(varNames)).String())
+			varNames = must(cdr(varNames))
 		}
 		res.body = body
 	}
@@ -73,5 +73,5 @@ func (fn lambdaFunction) Apply(env *environment, args []sexp) (sexp, error) {
 		newEnv.vars[fn.varNames[i]] = newArgs[i]
 	}
 
-	return must(car(env, fn.body)).Eval(newEnv)
+	return must(car(fn.body)).Eval(newEnv)
 }

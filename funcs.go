@@ -11,12 +11,8 @@ func checkArity(args []sexp, n int) error {
 	return nil
 }
 
-func car(env *environment, args ...sexp) (sexp, error) {
-	if err := checkArity(args, 1); err != nil {
-		return nil, err
-	}
-
-	cell, ok := args[0].(*cell)
+func car(x sexp) (sexp, error) {
+	cell, ok := x.(*cell)
 	if !ok || cell == nil {
 		return symNil, nil
 	}
@@ -24,17 +20,29 @@ func car(env *environment, args ...sexp) (sexp, error) {
 	return cell.car, nil
 }
 
-func cdr(env *environment, args ...sexp) (sexp, error) {
+func lispCar(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
 
-	cell, ok := args[0].(*cell)
+	return car(args[0])
+}
+
+func cdr(x sexp) (sexp, error) {
+	cell, ok := x.(*cell)
 	if !ok || cell == nil {
 		return symNil, nil
 	}
 
 	return cell.cdr, nil
+}
+
+func lispCdr(env *environment, args ...sexp) (sexp, error) {
+	if err := checkArity(args, 1); err != nil {
+		return nil, err
+	}
+
+	return cdr(args[0])
 }
 
 func cons(env *environment, args ...sexp) (sexp, error) {
@@ -45,8 +53,16 @@ func cons(env *environment, args ...sexp) (sexp, error) {
 	return &cell{args[0], args[1]}, nil
 }
 
-func list(env *environment, args ...sexp) (sexp, error) {
-	return joinSexps(args), nil
+func list(sexps []sexp) sexp {
+	xs := sexp(symNil)
+	for i := len(sexps) - 1; i >= 0; i-- {
+		xs = &cell{sexps[i], xs}
+	}
+	return xs
+}
+
+func lispList(env *environment, args ...sexp) (sexp, error) {
+	return list(args), nil
 }
 
 func quote(env *environment, args ...sexp) (sexp, error) {
@@ -70,8 +86,8 @@ func eq(env *environment, args ...sexp) (sexp, error) {
 
 func cond(env *environment, args ...sexp) (sexp, error) {
 	for i, clause := range args {
-		cond := must(car(env, clause))
-		body := must(cdr(env, clause))
+		cond := must(car(clause))
+		body := must(cdr(clause))
 
 		res, err := cond.Eval(env)
 		if err != nil {
@@ -79,7 +95,7 @@ func cond(env *environment, args ...sexp) (sexp, error) {
 		}
 
 		if res != symNil {
-			return must(car(env, body)).Eval(env)
+			return must(car(body)).Eval(env)
 		}
 	}
 

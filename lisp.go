@@ -9,14 +9,6 @@ type sexp interface {
 	String() string
 }
 
-func joinSexps(sexps []sexp) sexp {
-	xs := sexp(symNil)
-	for i := len(sexps) - 1; i >= 0; i-- {
-		xs = &cell{sexps[i], xs}
-	}
-	return xs
-}
-
 func must(x sexp, err error) sexp {
 	if err != nil {
 		panic(err)
@@ -59,7 +51,7 @@ func (c *cell) Eval(env *environment) (sexp, error) {
 		if x.car != symLambda {
 			return nil, fmt.Errorf("invalid function %v", c.car)
 		}
-		return newLambdaFunction(env, x.cdr).Apply(env, args)
+		return newLambdaFunction(x.cdr).Apply(env, args)
 	}
 	return nil, fmt.Errorf("invalid function %v", c.car)
 }
@@ -68,8 +60,8 @@ func (c *cell) arguments(env *environment) []sexp {
 	rest := c.cdr
 	args := []sexp{}
 	for rest != symNil {
-		args = append(args, must(car(env, rest)))
-		rest = must(cdr(env, rest))
+		args = append(args, must(car(rest)))
+		rest = must(cdr(rest))
 	}
 
 	return args
