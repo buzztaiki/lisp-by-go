@@ -140,12 +140,20 @@ func plus(env *environment, args []sexp) (sexp, error) {
 	return number(res), nil
 }
 
+// 引数が 1 つの場合はその負数を返す。
+// 二つ以上の場合は引き算する。
 func minus(env *environment, args []sexp) (sexp, error) {
 	res := float64(0)
+
 	for i, x := range args {
 		num, ok := x.(number)
 		if !ok {
 			return nil, fmt.Errorf("args[%d]: wrong number type argument %v", i, x)
+		}
+
+		// 引数が複数ある場合は最初の値をひっくりかえす
+		if i == 1 {
+			res *= -1
 		}
 		res -= float64(num)
 	}
