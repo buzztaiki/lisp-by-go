@@ -2,6 +2,7 @@ package main
 
 const symNil = symbol("nil")
 const symTrue = symbol("t")
+const symLambda = symbol("lambda")
 
 type environment struct {
 	funcs map[string]appliable
@@ -23,4 +24,15 @@ func newEnvironment() *environment {
 			symTrue.String(): symTrue,
 		},
 	}
+}
+
+func (env *environment) clone() *environment {
+	newEnv := &environment{map[string]appliable{}, map[string]sexp{}}
+	for k, v := range env.funcs {
+		newEnv.funcs[k] = v
+	}
+	for k, v := range env.vars {
+		newEnv.vars[k] = v
+	}
+	return newEnv
 }

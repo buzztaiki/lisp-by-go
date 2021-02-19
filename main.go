@@ -20,6 +20,10 @@ func main() {
 			symbol("a"),
 			l(symbol("cons"), symbol("b"), l(symbol("quote"), symbol("c"))),
 		),
+		l(
+			symbol("quote"),
+			symbol("a"),
+		),
 		l(),
 		l(
 			symbol("cons"),
@@ -31,6 +35,11 @@ func main() {
 			l(l(symbol("eq"), symbol("a"), symbol("a")), symbol("b")),
 			l(symbol("t"), symbol("z")),
 		),
+		l(l(
+			symbol("lambda"),
+			l(symbol("a"), symbol("b")),
+			l(symbol("eq"), symbol("a"), symbol("b")),
+		), l(symbol("quote"), symbol("x")), l(symbol("quote"), symbol("x"))),
 	}
 
 	for _, src := range srcs {
