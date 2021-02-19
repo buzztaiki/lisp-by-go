@@ -71,6 +71,18 @@ func (c *cell) arguments(env *environment) []sexp {
 	return args
 }
 
+func (c *cell) stringNoParen() string {
+	switch x := c.cdr.(type) {
+	case *cell:
+		return fmt.Sprintf("%v %v", c.car, x.stringNoParen())
+	default:
+		if x == symNil {
+			return fmt.Sprint(c.car)
+		}
+		return fmt.Sprintf("%v . %v", c.car, x)
+	}
+}
+
 func (c *cell) String() string {
-	return fmt.Sprintf("(%v . %v)", c.car, c.cdr)
+	return "(" + c.stringNoParen() + ")"
 }
