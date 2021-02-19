@@ -37,6 +37,28 @@ func split(x expr) (expr, expr) {
 	return car(x), cdr(x)
 }
 
+func cons(a, b expr) expr {
+	return &cell{a, b}
+}
+
+func list(exprs ...expr) expr {
+	xs := expr(symNil)
+	for i := len(exprs) - 1; i >= 0; i-- {
+		xs = &cell{exprs[i], xs}
+	}
+	return xs
+}
+
+func expand(x expr) []expr {
+	res := []expr{}
+	for x != symNil {
+		res = append(res, car(x))
+		x = cdr(x)
+	}
+
+	return res
+}
+
 func lispCar(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
@@ -53,23 +75,11 @@ func lispCdr(env *environment, args []expr) (expr, error) {
 	return cdr(args[0]), nil
 }
 
-func cons(a, b expr) expr {
-	return &cell{a, b}
-}
-
 func lispCons(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
 	return cons(args[0], args[1]), nil
-}
-
-func list(exprs ...expr) expr {
-	xs := expr(symNil)
-	for i := len(exprs) - 1; i >= 0; i-- {
-		xs = &cell{exprs[i], xs}
-	}
-	return xs
 }
 
 func lispList(env *environment, args []expr) (expr, error) {

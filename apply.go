@@ -4,6 +4,33 @@ import (
 	"fmt"
 )
 
+func apply(env *environment, fnExpr expr, argsExpr expr) (expr, error) {
+	switch x := fnExpr.(type) {
+	case symbol:
+		fn := env.funcs[x.String()]
+		if fn == nil {
+			return nil, fmt.Errorf("unknown function %v", fnExpr)
+		}
+
+		res, err := fn.Apply(env, expand(argsExpr))
+		if err != nil {
+			return nil, fmt.Errorf("%v: %w", x, err)
+		}
+		return res, nil
+	case *cell:
+		if x.car != symLambda {
+			return nil, fmt.Errorf("invalid function %v", fnExpr)
+		}
+
+		res, err := newLambdaFunction(x.cdr).Apply(env, expand(argsExpr))
+		if err != nil {
+			return nil, fmt.Errorf("lambda: %w", err)
+		}
+		return res, nil
+	}
+	return nil, fmt.Errorf("invalid function %v", fnExpr)
+}
+
 type appliable interface {
 	Apply(env *environment, args []expr) (expr, error)
 }

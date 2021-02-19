@@ -45,43 +45,7 @@ type cell struct {
 }
 
 func (c *cell) Eval(env *environment) (expr, error) {
-	args := c.arguments(env)
-
-	switch x := c.car.(type) {
-	case symbol:
-		fn := env.funcs[x.String()]
-		if fn == nil {
-			return nil, fmt.Errorf("unknown function %v", c.car)
-		}
-
-		res, err := fn.Apply(env, args)
-		if err != nil {
-			return nil, fmt.Errorf("%v: %w", x, err)
-		}
-		return res, nil
-	case *cell:
-		if x.car != symLambda {
-			return nil, fmt.Errorf("invalid function %v", c.car)
-		}
-
-		res, err := newLambdaFunction(x.cdr).Apply(env, args)
-		if err != nil {
-			return nil, fmt.Errorf("lambda: %w", err)
-		}
-		return res, nil
-	}
-	return nil, fmt.Errorf("invalid function %v", c.car)
-}
-
-func (c *cell) arguments(env *environment) []expr {
-	rest := c.cdr
-	args := []expr{}
-	for rest != symNil {
-		args = append(args, car(rest))
-		rest = cdr(rest)
-	}
-
-	return args
+	return apply(env, c.car, c.cdr)
 }
 
 func (c *cell) stringNoParen() string {
