@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"strconv"
+	"strings"
 )
 
 type parser struct {
@@ -28,6 +29,7 @@ func (p *parser) scan() (string, error) {
 }
 
 func (p *parser) unscan(token string) {
+
 	p.backlog = token
 }
 
@@ -37,13 +39,26 @@ func (p *parser) parseSexp() (expr, error) {
 		return nil, err
 	}
 
-	if token == "(" {
-		return p.parseList()
+	fn := func(token string) (expr, error) {
+		if token == "(" {
+			return p.parseList()
+		}
+		if n, err := strconv.ParseFloat(token, 64); err == nil {
+			return number(n), nil
+		}
+		return symbol(token), nil
 	}
-	if n, err := strconv.ParseFloat(token, 64); err == nil {
-		return number(n), nil
+
+	quoted := strings.HasPrefix(token, "'")
+	if !quoted {
+		return fn(token)
 	}
-	return symbol(token), nil
+
+	res, err := fn(token[1:])
+	if err != nil {
+		return nil, err
+	}
+	return list(symbol("quote"), res), nil
 }
 
 func (p *parser) parseList() (expr, error) {

@@ -25,6 +25,15 @@ func (sc *scanner) scan() (string, error) {
 		return string(c), nil
 	}
 
+	if c == '\'' {
+		tok, err := sc.scan()
+		if err != nil {
+			return "", err
+		}
+		return "'" + tok, nil
+
+	}
+
 	return sc.scanToken(c)
 }
 
@@ -52,7 +61,7 @@ func (sc *scanner) scanToken(head rune) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if unicode.IsSpace(c) || c == '(' || c == ')' {
+		if unicode.IsSpace(c) || c == '(' || c == ')' || c == '\'' {
 			sc.src.UnreadRune()
 			return buf.String(), nil
 		}

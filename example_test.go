@@ -141,13 +141,13 @@ func ExampleReplFizzBuzz() {
 (defun fzbz (n max nfizz nbuzz)
   (cond ((eq n max) nil)
         ((and (list (eq nfizz 3) (eq nbuzz 5)))
-         (cons (quote fizzbuzz)
+         (cons 'fizzbuzz
                (fzbz (+ n 1) max 1 1)))
         ((eq nfizz 3)
-         (cons (quote fizz)
+         (cons 'fizz
                (fzbz (+ n 1) max 1 (+ nbuzz 1))))
         ((eq nbuzz 5)
-         (cons (quote buzz)
+         (cons 'buzz
                (fzbz (+ n 1) max (+ nfizz 1) 1)))
         (t
          (cons n
