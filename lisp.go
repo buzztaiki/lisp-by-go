@@ -5,14 +5,14 @@ import (
 	"strconv"
 )
 
-type sexp interface {
-	Eval(env *environment) (sexp, error)
+type expr interface {
+	Eval(env *environment) (expr, error)
 	String() string
 }
 
 type symbol string
 
-func (sym symbol) Eval(env *environment) (sexp, error) {
+func (sym symbol) Eval(env *environment) (expr, error) {
 	x := env.vars[sym.String()]
 	if x == nil {
 		return nil, fmt.Errorf("variable %v not found", sym)
@@ -31,7 +31,7 @@ const symLambda = symbol("lambda")
 
 type number float64
 
-func (num number) Eval(env *environment) (sexp, error) {
+func (num number) Eval(env *environment) (expr, error) {
 	return num, nil
 }
 
@@ -40,11 +40,11 @@ func (num number) String() string {
 }
 
 type cell struct {
-	car sexp
-	cdr sexp
+	car expr
+	cdr expr
 }
 
-func (c *cell) Eval(env *environment) (sexp, error) {
+func (c *cell) Eval(env *environment) (expr, error) {
 	args := c.arguments(env)
 
 	switch x := c.car.(type) {
@@ -64,9 +64,9 @@ func (c *cell) Eval(env *environment) (sexp, error) {
 	return nil, fmt.Errorf("invalid function %v", c.car)
 }
 
-func (c *cell) arguments(env *environment) []sexp {
+func (c *cell) arguments(env *environment) []expr {
 	rest := c.cdr
-	args := []sexp{}
+	args := []expr{}
 	for rest != symNil {
 		args = append(args, car(rest))
 		rest = cdr(rest)

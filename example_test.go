@@ -6,12 +6,12 @@ import (
 )
 
 func ExampleEval() {
-	l := func(args ...sexp) sexp { return list(args...) }
+	l := func(args ...expr) expr { return list(args...) }
 	s := func(x string) symbol { return symbol(x) }
 	n := func(x float64) number { return number(x) }
-	q := func(x string) sexp { return l(s("quote"), s(x)) }
+	q := func(x string) expr { return l(s("quote"), s(x)) }
 
-	srcs := []sexp{
+	srcs := []expr{
 		&cell{
 			s("cons"),
 			&cell{

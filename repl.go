@@ -11,7 +11,7 @@ func repl(prompt, rprompt string, r io.Reader) {
 	p := newParser(r)
 	for {
 		fmt.Print(prompt)
-		sexp, err := p.parse()
+		expr, err := p.parse()
 		if err == io.EOF {
 			break
 		}
@@ -19,7 +19,7 @@ func repl(prompt, rprompt string, r io.Reader) {
 			fmt.Fprintln(os.Stderr, "read error:", err)
 		}
 
-		res, err := sexp.Eval(env)
+		res, err := expr.Eval(env)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "eval error:", err)
 		}

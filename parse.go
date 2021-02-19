@@ -14,7 +14,7 @@ func newParser(src io.Reader) *parser {
 	return &parser{newScanner(src), ""}
 }
 
-func (p *parser) parse() (sexp, error) {
+func (p *parser) parse() (expr, error) {
 	return p.parseSexp()
 }
 
@@ -31,7 +31,7 @@ func (p *parser) unscan(token string) {
 	p.backlog = token
 }
 
-func (p *parser) parseSexp() (sexp, error) {
+func (p *parser) parseSexp() (expr, error) {
 	token, err := p.scan()
 	if err != nil {
 		return nil, err
@@ -46,8 +46,8 @@ func (p *parser) parseSexp() (sexp, error) {
 	return symbol(token), nil
 }
 
-func (p *parser) parseList() (sexp, error) {
-	sexps := []sexp{}
+func (p *parser) parseList() (expr, error) {
+	exprs := []expr{}
 
 	for {
 		token, err := p.scanner.scan()
@@ -56,14 +56,14 @@ func (p *parser) parseList() (sexp, error) {
 		}
 
 		if token == ")" {
-			return list(sexps...), nil
+			return list(exprs...), nil
 		}
 
 		p.unscan(token)
-		sexp, err := p.parseSexp()
+		expr, err := p.parseSexp()
 		if err != nil {
 			return nil, err
 		}
-		sexps = append(sexps, sexp)
+		exprs = append(exprs, expr)
 	}
 }

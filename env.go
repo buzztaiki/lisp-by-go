@@ -2,7 +2,7 @@ package main
 
 type environment struct {
 	funcs map[string]appliable
-	vars  map[string]sexp
+	vars  map[string]expr
 }
 
 func newEnvironment() *environment {
@@ -20,7 +20,7 @@ func newEnvironment() *environment {
 			"lambda": specialForm(lambda),
 			"defun":  specialForm(defun),
 		},
-		map[string]sexp{
+		map[string]expr{
 			symNil.String():  symNil,
 			symTrue.String(): symTrue,
 		},
@@ -28,7 +28,7 @@ func newEnvironment() *environment {
 }
 
 func (env *environment) clone() *environment {
-	newEnv := &environment{map[string]appliable{}, map[string]sexp{}}
+	newEnv := &environment{map[string]appliable{}, map[string]expr{}}
 	for k, v := range env.funcs {
 		newEnv.funcs[k] = v
 	}

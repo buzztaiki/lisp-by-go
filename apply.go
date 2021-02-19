@@ -5,11 +5,11 @@ import (
 )
 
 type appliable interface {
-	Apply(env *environment, args []sexp) (sexp, error)
+	Apply(env *environment, args []expr) (expr, error)
 }
 
-func evalArgs(env *environment, args []sexp) ([]sexp, error) {
-	newArgs := []sexp{}
+func evalArgs(env *environment, args []expr) ([]expr, error) {
+	newArgs := []expr{}
 	for i, arg := range args {
 		arg2, err := arg.Eval(env)
 		if err != nil {
@@ -21,9 +21,9 @@ func evalArgs(env *environment, args []sexp) ([]sexp, error) {
 	return newArgs, nil
 }
 
-type function func(env *environment, args []sexp) (sexp, error)
+type function func(env *environment, args []expr) (expr, error)
 
-func (fn function) Apply(env *environment, args []sexp) (sexp, error) {
+func (fn function) Apply(env *environment, args []expr) (expr, error) {
 	newArgs, err := evalArgs(env, args)
 	if err != nil {
 		return nil, err
@@ -32,18 +32,18 @@ func (fn function) Apply(env *environment, args []sexp) (sexp, error) {
 	return fn(env, newArgs)
 }
 
-type specialForm func(env *environment, args []sexp) (sexp, error)
+type specialForm func(env *environment, args []expr) (expr, error)
 
-func (fn specialForm) Apply(env *environment, args []sexp) (sexp, error) {
+func (fn specialForm) Apply(env *environment, args []expr) (expr, error) {
 	return fn(env, args)
 }
 
 type lambdaFunction struct {
 	varNames []string
-	body     sexp
+	body     expr
 }
 
-func newLambdaFunction(argsAndBody sexp) *lambdaFunction {
+func newLambdaFunction(argsAndBody expr) *lambdaFunction {
 	res := &lambdaFunction{[]string{}, symNil}
 
 	varNames, body := split(argsAndBody)
@@ -55,7 +55,7 @@ func newLambdaFunction(argsAndBody sexp) *lambdaFunction {
 	return res
 }
 
-func (fn lambdaFunction) Apply(env *environment, args []sexp) (sexp, error) {
+func (fn lambdaFunction) Apply(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, len(fn.varNames)); err != nil {
 		return nil, err
 	}

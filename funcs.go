@@ -4,18 +4,18 @@ import (
 	"fmt"
 )
 
-func checkArity(args []sexp, n int) error {
+func checkArity(args []expr, n int) error {
 	return checkArityX(args, func() bool { return len(args) == n })
 }
 
-func checkArityX(args []sexp, pred func() bool) error {
+func checkArityX(args []expr, pred func() bool) error {
 	if !pred() {
 		return fmt.Errorf("wrong number of argument %d", len(args))
 	}
 	return nil
 }
 
-func car(x sexp) sexp {
+func car(x expr) expr {
 	cell, ok := x.(*cell)
 	if !ok || cell == nil {
 		return symNil
@@ -24,7 +24,7 @@ func car(x sexp) sexp {
 	return cell.car
 }
 
-func cdr(x sexp) sexp {
+func cdr(x expr) expr {
 	cell, ok := x.(*cell)
 	if !ok || cell == nil {
 		return symNil
@@ -33,11 +33,11 @@ func cdr(x sexp) sexp {
 	return cell.cdr
 }
 
-func split(x sexp) (sexp, sexp) {
+func split(x expr) (expr, expr) {
 	return car(x), cdr(x)
 }
 
-func lispCar(env *environment, args []sexp) (sexp, error) {
+func lispCar(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func lispCar(env *environment, args []sexp) (sexp, error) {
 	return car(args[0]), nil
 }
 
-func lispCdr(env *environment, args []sexp) (sexp, error) {
+func lispCdr(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -53,37 +53,37 @@ func lispCdr(env *environment, args []sexp) (sexp, error) {
 	return cdr(args[0]), nil
 }
 
-func cons(a, b sexp) sexp {
+func cons(a, b expr) expr {
 	return &cell{a, b}
 }
 
-func lispCons(env *environment, args []sexp) (sexp, error) {
+func lispCons(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
 	return cons(args[0], args[1]), nil
 }
 
-func list(sexps ...sexp) sexp {
-	xs := sexp(symNil)
-	for i := len(sexps) - 1; i >= 0; i-- {
-		xs = &cell{sexps[i], xs}
+func list(exprs ...expr) expr {
+	xs := expr(symNil)
+	for i := len(exprs) - 1; i >= 0; i-- {
+		xs = &cell{exprs[i], xs}
 	}
 	return xs
 }
 
-func lispList(env *environment, args []sexp) (sexp, error) {
+func lispList(env *environment, args []expr) (expr, error) {
 	return list(args...), nil
 }
 
-func quote(env *environment, args []sexp) (sexp, error) {
+func quote(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
 	return args[0], nil
 }
 
-func eq(env *environment, args []sexp) (sexp, error) {
+func eq(env *environment, args []expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func eq(env *environment, args []sexp) (sexp, error) {
 	return symTrue, nil
 }
 
-func cond(env *environment, args []sexp) (sexp, error) {
+func cond(env *environment, args []expr) (expr, error) {
 	for i, clause := range args {
 		cond, body := split(clause)
 
@@ -112,11 +112,11 @@ func cond(env *environment, args []sexp) (sexp, error) {
 	return symNil, nil
 }
 
-func lambda(env *environment, args []sexp) (sexp, error) {
+func lambda(env *environment, args []expr) (expr, error) {
 	return cons(symLambda, list(args...)), nil
 }
 
-func defun(env *environment, args []sexp) (sexp, error) {
+func defun(env *environment, args []expr) (expr, error) {
 	if err := checkArityX(args, func() bool { return len(args) > 1 }); err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func defun(env *environment, args []sexp) (sexp, error) {
 	return name, nil
 }
 
-func plus(env *environment, args []sexp) (sexp, error) {
+func plus(env *environment, args []expr) (expr, error) {
 	res := float64(0)
 	for i, x := range args {
 		num, ok := x.(number)
@@ -142,7 +142,7 @@ func plus(env *environment, args []sexp) (sexp, error) {
 
 // 引数が 1 つの場合はその負数を返す。
 // 二つ以上の場合は引き算する。
-func minus(env *environment, args []sexp) (sexp, error) {
+func minus(env *environment, args []expr) (expr, error) {
 	res := float64(0)
 
 	for i, x := range args {
