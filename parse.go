@@ -62,23 +62,33 @@ func (p *parser) parseSexp() (expr, error) {
 }
 
 func (p *parser) parseList() (expr, error) {
-	exprs := []expr{}
-
-	for {
-		token, err := p.scanner.scan()
-		if err != nil {
-			return nil, err
-		}
-
-		if token == ")" {
-			return list(exprs...), nil
-		}
-
-		p.unscan(token)
-		expr, err := p.parseSexp()
-		if err != nil {
-			return nil, err
-		}
-		exprs = append(exprs, expr)
+	token, err := p.scanner.scan()
+	if err != nil {
+		return nil, err
 	}
+
+	if token == ")" {
+		return symNil, nil
+	}
+
+	if token == "." {
+		rest, err := p.parseList()
+		if err != nil {
+			return nil, err
+		}
+		return car(rest), nil
+	}
+
+	p.unscan(token)
+	expr, err := p.parseSexp()
+	if err != nil {
+		return nil, err
+	}
+
+	rest, err := p.parseList()
+	if err != nil {
+		return nil, err
+	}
+
+	return cons(expr, rest), nil
 }

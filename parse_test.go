@@ -16,6 +16,7 @@ func TestParser(t *testing.T) {
 		{"(+ 10 20)", list(symbol("+"), number(10), number(20))},
 		{"'a", list(symbol("quote"), symbol("a"))},
 		{"'(a b)", list(symbol("quote"), list(symbol("a"), symbol("b")))},
+		{"(a b . c)", cons(symbol("a"), cons(symbol("b"), symbol("c")))},
 	}
 
 	for _, c := range cases {
