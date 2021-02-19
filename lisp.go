@@ -25,6 +25,10 @@ func (sym symbol) String() string {
 	return string(sym)
 }
 
+const symNil = symbol("nil")
+const symTrue = symbol("t")
+const symLambda = symbol("lambda")
+
 type number float64
 
 func (num number) Eval(env *environment) (sexp, error) {

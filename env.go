@@ -1,9 +1,5 @@
 package main
 
-const symNil = symbol("nil")
-const symTrue = symbol("t")
-const symLambda = symbol("lambda")
-
 type environment struct {
 	funcs map[string]appliable
 	vars  map[string]sexp
