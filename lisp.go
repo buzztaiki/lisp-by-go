@@ -5,8 +5,16 @@ import (
 )
 
 type sexp interface {
-	Eval() (sexp, error)
+	Eval(env *environment) (sexp, error)
 	String() string
+}
+
+func joinSexps(sexps []sexp) sexp {
+	xs := sexp(symNil)
+	for i := len(sexps) - 1; i >= 0; i-- {
+		xs = &cell{sexps[i], xs}
+	}
+	return xs
 }
 
 func must(x sexp, err error) sexp {
@@ -18,7 +26,7 @@ func must(x sexp, err error) sexp {
 
 type symbol string
 
-func (sym symbol) Eval() (sexp, error) {
+func (sym symbol) Eval(env *environment) (sexp, error) {
 	return sym, nil
 }
 
@@ -26,44 +34,32 @@ func (sym symbol) String() string {
 	return string(sym)
 }
 
-const symNil = symbol("nil")
-const symTrue = symbol("t")
-
 type cell struct {
 	car sexp
 	cdr sexp
 }
 
-func (c *cell) Eval() (sexp, error) {
+func (c *cell) Eval(env *environment) (sexp, error) {
 	sym, ok := c.car.(symbol)
 	if !ok {
 		return nil, fmt.Errorf("invalid function %v", c.car)
 	}
 
-	args := c.arguments()
-	funcs := map[string]appliable{
-		"cons":  function(cons),
-		"car":   function(car),
-		"cdr":   function(cdr),
-		"eq":    function(eq),
-		"quote": specialForm(quote),
-		"cond":  specialForm(cond),
-	}
-
-	fn := funcs[sym.String()]
+	args := c.arguments(env)
+	fn := env.funcs[sym.String()]
 	if fn == nil {
 		return nil, fmt.Errorf("unknown function %v", c.car)
 	}
 
-	return fn.Apply(args)
+	return fn.Apply(env, args)
 }
 
-func (c *cell) arguments() []sexp {
+func (c *cell) arguments(env *environment) []sexp {
 	rest := c.cdr
 	args := []sexp{}
 	for rest != symNil {
-		args = append(args, must(car(rest)))
-		rest = must(cdr(rest))
+		args = append(args, must(car(env, rest)))
+		rest = must(cdr(env, rest))
 	}
 
 	return args

@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func checkArity(args []sexp, n int) error {
 	if len(args) != n {
@@ -9,7 +11,7 @@ func checkArity(args []sexp, n int) error {
 	return nil
 }
 
-func car(args ...sexp) (sexp, error) {
+func car(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -22,7 +24,7 @@ func car(args ...sexp) (sexp, error) {
 	return cell.car, nil
 }
 
-func cdr(args ...sexp) (sexp, error) {
+func cdr(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -35,7 +37,7 @@ func cdr(args ...sexp) (sexp, error) {
 	return cell.cdr, nil
 }
 
-func cons(args ...sexp) (sexp, error) {
+func cons(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -43,22 +45,18 @@ func cons(args ...sexp) (sexp, error) {
 	return &cell{args[0], args[1]}, nil
 }
 
-func list(sexps ...sexp) (sexp, error) {
-	xs := sexp(symNil)
-	for i := len(sexps) - 1; i >= 0; i-- {
-		xs = &cell{sexps[i], xs}
-	}
-	return xs, nil
+func list(env *environment, args ...sexp) (sexp, error) {
+	return joinSexps(args), nil
 }
 
-func quote(args ...sexp) (sexp, error) {
+func quote(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
 	return args[0], nil
 }
 
-func eq(args ...sexp) (sexp, error) {
+func eq(env *environment, args ...sexp) (sexp, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -70,18 +68,18 @@ func eq(args ...sexp) (sexp, error) {
 	return symTrue, nil
 }
 
-func cond(args ...sexp) (sexp, error) {
+func cond(env *environment, args ...sexp) (sexp, error) {
 	for i, clause := range args {
-		cond := must(car(clause))
-		body := must(cdr(clause))
+		cond := must(car(env, clause))
+		body := must(cdr(env, clause))
 
-		res, err := cond.Eval()
+		res, err := cond.Eval(env)
 		if err != nil {
 			return nil, fmt.Errorf("clauses[%d]: %w", i, err)
 		}
 
 		if res != symNil {
-			return must(car(body)).Eval()
+			return must(car(env, body)).Eval(env)
 		}
 	}
 

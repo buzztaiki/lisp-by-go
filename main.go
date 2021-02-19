@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 	l := func(args ...sexp) sexp {
-		return must(list(args...))
+		return joinSexps(args)
 	}
 
 	srcs := []sexp{
@@ -35,7 +35,7 @@ func main() {
 
 	for _, src := range srcs {
 		fmt.Println(src)
-		fmt.Println(src.Eval())
+		fmt.Println(src.Eval(newEnvironment()))
 		fmt.Println()
 	}
 }

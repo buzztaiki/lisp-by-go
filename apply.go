@@ -3,15 +3,15 @@ package main
 import "fmt"
 
 type appliable interface {
-	Apply(args []sexp) (sexp, error)
+	Apply(env *environment, args []sexp) (sexp, error)
 }
 
-type function func(args ...sexp) (sexp, error)
+type function func(env *environment, args ...sexp) (sexp, error)
 
-func (fn function) Apply(args []sexp) (sexp, error) {
+func (fn function) Apply(env *environment, args []sexp) (sexp, error) {
 	args2 := []sexp{}
 	for i, arg := range args {
-		arg2, err := arg.Eval()
+		arg2, err := arg.Eval(env)
 		if err != nil {
 			return nil, fmt.Errorf("args[%d]: %w", i, err)
 		}
@@ -19,11 +19,11 @@ func (fn function) Apply(args []sexp) (sexp, error) {
 		args2 = append(args2, arg2)
 	}
 
-	return fn(args2...)
+	return fn(env, args2...)
 }
 
-type specialForm func(args ...sexp) (sexp, error)
+type specialForm func(env *environment, args ...sexp) (sexp, error)
 
-func (fn specialForm) Apply(args []sexp) (sexp, error) {
-	return fn(args...)
+func (fn specialForm) Apply(env *environment, args []sexp) (sexp, error) {
+	return fn(env, args...)
 }
