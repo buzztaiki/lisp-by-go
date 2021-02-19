@@ -12,13 +12,14 @@ type environment struct {
 func newEnvironment() *environment {
 	return &environment{
 		map[string]appliable{
-			"cons":  function(cons),
-			"list":  function(lispList),
-			"car":   function(lispCar),
-			"cdr":   function(lispCdr),
-			"eq":    function(eq),
-			"quote": specialForm(quote),
-			"cond":  specialForm(cond),
+			"cons":   function(lispCons),
+			"list":   function(lispList),
+			"car":    function(lispCar),
+			"cdr":    function(lispCdr),
+			"eq":     function(eq),
+			"quote":  specialForm(quote),
+			"cond":   specialForm(cond),
+			"lambda": specialForm(lambda),
 		},
 		map[string]sexp{
 			symNil.String():  symNil,

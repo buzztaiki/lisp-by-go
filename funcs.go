@@ -49,12 +49,15 @@ func lispCdr(env *environment, args []sexp) (sexp, error) {
 	return cdr(args[0]), nil
 }
 
-func cons(env *environment, args []sexp) (sexp, error) {
+func cons(a, b sexp) sexp {
+	return &cell{a, b}
+}
+
+func lispCons(env *environment, args []sexp) (sexp, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
-
-	return &cell{args[0], args[1]}, nil
+	return cons(args[0], args[1]), nil
 }
 
 func list(sexps ...sexp) sexp {
@@ -103,4 +106,8 @@ func cond(env *environment, args []sexp) (sexp, error) {
 	}
 
 	return symNil, nil
+}
+
+func lambda(env *environment, args []sexp) (sexp, error) {
+	return cons(symLambda, list(args...)), nil
 }
