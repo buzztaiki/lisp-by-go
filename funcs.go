@@ -69,3 +69,21 @@ func eq(args ...sexp) (sexp, error) {
 
 	return symTrue, nil
 }
+
+func cond(args ...sexp) (sexp, error) {
+	for i, clause := range args {
+		cond := must(car(clause))
+		body := must(cdr(clause))
+
+		res, err := cond.Eval()
+		if err != nil {
+			return nil, fmt.Errorf("clauses[%d]: %w", i, err)
+		}
+
+		if res != symNil {
+			return must(car(body)).Eval()
+		}
+	}
+
+	return symNil, nil
+}

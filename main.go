@@ -18,13 +18,18 @@ func main() {
 		l(
 			symbol("cons"),
 			symbol("a"),
-			l(symbol("cons"), symbol("b"), symbol("c")),
+			l(symbol("cons"), symbol("b"), l(symbol("quote"), symbol("c"))),
 		),
 		l(),
 		l(
 			symbol("cons"),
 			l(symbol("eq"), symbol("a"), symbol("a")),
 			l(symbol("eq"), symbol("b"), symbol("c")),
+		),
+		l(
+			symbol("cond"),
+			l(l(symbol("eq"), symbol("a"), symbol("a")), symbol("b")),
+			l(symbol("t"), symbol("z")),
 		),
 	}
 

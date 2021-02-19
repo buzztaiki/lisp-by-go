@@ -47,6 +47,7 @@ func (c *cell) Eval() (sexp, error) {
 		"cdr":   function(cdr),
 		"eq":    function(eq),
 		"quote": specialForm(quote),
+		"cond":  specialForm(cond),
 	}
 
 	fn := funcs[sym.String()]
