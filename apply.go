@@ -21,9 +21,9 @@ func evalArgs(env *environment, args []expr) ([]expr, error) {
 	return newArgs, nil
 }
 
-type function func(env *environment, args []expr) (expr, error)
+type builtinFunction func(env *environment, args []expr) (expr, error)
 
-func (fn function) Apply(env *environment, args []expr) (expr, error) {
+func (fn builtinFunction) Apply(env *environment, args []expr) (expr, error) {
 	newArgs, err := evalArgs(env, args)
 	if err != nil {
 		return nil, err

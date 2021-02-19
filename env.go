@@ -8,13 +8,13 @@ type environment struct {
 func newEnvironment() *environment {
 	return &environment{
 		map[string]appliable{
-			"cons":   function(lispCons),
-			"list":   function(lispList),
-			"car":    function(lispCar),
-			"cdr":    function(lispCdr),
-			"eq":     function(eq),
-			"+":      function(plus),
-			"-":      function(minus),
+			"cons":   builtinFunction(lispCons),
+			"list":   builtinFunction(lispList),
+			"car":    builtinFunction(lispCar),
+			"cdr":    builtinFunction(lispCdr),
+			"eq":     builtinFunction(eq),
+			"+":      builtinFunction(plus),
+			"-":      builtinFunction(minus),
 			"quote":  specialForm(quote),
 			"cond":   specialForm(cond),
 			"lambda": specialForm(lambda),
