@@ -45,6 +45,9 @@ func main() {
 		l(s("+"), n(10), n(20)),
 		l(s("+"), n(10), l(s("-"), n(10), n(30))),
 		l(s("+"), n(10), l(s("quote"), s("x"))),
+		l(s("defun"), s("f"), l(s("x")), l(s("+"), s("x"), s("x"))),
+		l(s("f"), n(3)),
+		l(s("f"), n(3), n(4)),
 	}
 
 	env := newEnvironment()

@@ -43,19 +43,15 @@ type lambdaFunction struct {
 	body     sexp
 }
 
-func newLambdaFunction(x sexp) *lambdaFunction {
+func newLambdaFunction(argsAndBody sexp) *lambdaFunction {
 	res := &lambdaFunction{[]string{}, symNil}
 
-	argsAndBody, ok := x.(*cell)
-	if ok {
-		varNames, body := split(argsAndBody)
-
-		for varNames != symNil {
-			res.varNames = append(res.varNames, car(varNames).String())
-			varNames = cdr(varNames)
-		}
-		res.body = body
+	varNames, body := split(argsAndBody)
+	for varNames != symNil {
+		res.varNames = append(res.varNames, car(varNames).String())
+		varNames = cdr(varNames)
 	}
+	res.body = body
 	return res
 }
 

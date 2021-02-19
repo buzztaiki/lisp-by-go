@@ -5,7 +5,11 @@ import (
 )
 
 func checkArity(args []sexp, n int) error {
-	if len(args) != n {
+	return checkArityX(args, func() bool { return len(args) == n })
+}
+
+func checkArityX(args []sexp, pred func() bool) error {
+	if !pred() {
 		return fmt.Errorf("wrong number of argument %d", len(args))
 	}
 	return nil
@@ -110,6 +114,18 @@ func cond(env *environment, args []sexp) (sexp, error) {
 
 func lambda(env *environment, args []sexp) (sexp, error) {
 	return cons(symLambda, list(args...)), nil
+}
+
+func defun(env *environment, args []sexp) (sexp, error) {
+	if err := checkArityX(args, func() bool { return len(args) > 1 }); err != nil {
+		return nil, err
+	}
+
+	name := args[0]
+	fn := newLambdaFunction(list(args[1:]...))
+	env.funcs[name.String()] = fn
+
+	return name, nil
 }
 
 func plus(env *environment, args []sexp) (sexp, error) {

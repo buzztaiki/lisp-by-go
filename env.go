@@ -22,6 +22,7 @@ func newEnvironment() *environment {
 			"quote":  specialForm(quote),
 			"cond":   specialForm(cond),
 			"lambda": specialForm(lambda),
+			"defun":  specialForm(defun),
 		},
 		map[string]sexp{
 			symNil.String():  symNil,
