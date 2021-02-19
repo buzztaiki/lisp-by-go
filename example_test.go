@@ -105,7 +105,7 @@ func ExampleEval() {
 	// ==> -10
 	//
 	// (+ 10 (quote x))
-	// error: +: args[1]: wrong number type argument x
+	// error: +: wrong number type argument x
 	//
 	// (defun f (x) (+ x x))
 	// ==> f

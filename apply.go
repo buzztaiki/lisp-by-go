@@ -12,7 +12,7 @@ func apply(env *environment, fnExpr expr, argsExpr expr) (expr, error) {
 			return nil, fmt.Errorf("unknown function %v", fnExpr)
 		}
 
-		res, err := fn.Apply(env, expand(argsExpr))
+		res, err := fn.Apply(env, argsExpr)
 		if err != nil {
 			return nil, fmt.Errorf("%v: %w", x, err)
 		}
@@ -22,7 +22,7 @@ func apply(env *environment, fnExpr expr, argsExpr expr) (expr, error) {
 			return nil, fmt.Errorf("invalid function %v", fnExpr)
 		}
 
-		res, err := newLambdaFunction(x.cdr).Apply(env, expand(argsExpr))
+		res, err := newLambdaFunction(x.cdr).Apply(env, argsExpr)
 		if err != nil {
 			return nil, fmt.Errorf("lambda: %w", err)
 		}
@@ -32,26 +32,20 @@ func apply(env *environment, fnExpr expr, argsExpr expr) (expr, error) {
 }
 
 type appliable interface {
-	Apply(env *environment, args []expr) (expr, error)
+	Apply(env *environment, args expr) (expr, error)
 }
 
-func evalArgs(env *environment, args []expr) ([]expr, error) {
-	newArgs := []expr{}
-	for i, arg := range args {
-		arg2, err := arg.Eval(env)
-		if err != nil {
-			return nil, fmt.Errorf("args[%d]: %w", i, err)
-		}
-
-		newArgs = append(newArgs, arg2)
-	}
-	return newArgs, nil
+func evalArgs(env *environment, args expr) (expr, error) {
+	return mapcar(func(x expr) (expr, error) {
+		return x.Eval(env)
+	}, args)
 }
 
-type builtinFunction func(env *environment, args []expr) (expr, error)
+type builtinFunction func(env *environment, args expr) (expr, error)
 
-func (fn builtinFunction) Apply(env *environment, args []expr) (expr, error) {
+func (fn builtinFunction) Apply(env *environment, args expr) (expr, error) {
 	newArgs, err := evalArgs(env, args)
+
 	if err != nil {
 		return nil, err
 	}
@@ -59,31 +53,23 @@ func (fn builtinFunction) Apply(env *environment, args []expr) (expr, error) {
 	return fn(env, newArgs)
 }
 
-type specialForm func(env *environment, args []expr) (expr, error)
+type specialForm func(env *environment, args expr) (expr, error)
 
-func (fn specialForm) Apply(env *environment, args []expr) (expr, error) {
+func (fn specialForm) Apply(env *environment, args expr) (expr, error) {
 	return fn(env, args)
 }
 
 type lambdaFunction struct {
-	varNames []string
+	varNames expr
 	body     expr
 }
 
 func newLambdaFunction(argsAndBody expr) *lambdaFunction {
-	res := &lambdaFunction{[]string{}, symNil}
-
-	varNames, body := split(argsAndBody)
-	for varNames != symNil {
-		res.varNames = append(res.varNames, car(varNames).String())
-		varNames = cdr(varNames)
-	}
-	res.body = body
-	return res
+	return &lambdaFunction{car(argsAndBody), cdr(argsAndBody)}
 }
 
-func (fn lambdaFunction) Apply(env *environment, args []expr) (expr, error) {
-	if err := checkArity(args, len(fn.varNames)); err != nil {
+func (fn lambdaFunction) Apply(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, length(fn.varNames)); err != nil {
 		return nil, err
 	}
 
@@ -93,8 +79,12 @@ func (fn lambdaFunction) Apply(env *environment, args []expr) (expr, error) {
 	}
 
 	newEnv := env.clone()
-	for i := range args {
-		newEnv.vars[fn.varNames[i]] = newArgs[i]
+	varNames := fn.varNames
+	for newArgs != symNil && varNames != symNil {
+		newEnv.vars[car(varNames).String()] = car(newArgs)
+
+		newArgs = cdr(newArgs)
+		varNames = cdr(varNames)
 	}
 
 	return car(fn.body).Eval(newEnv)
