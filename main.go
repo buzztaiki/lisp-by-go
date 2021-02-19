@@ -3,53 +3,54 @@ package main
 import "fmt"
 
 func main() {
-	l := func(args ...sexp) sexp {
-		return list(args...)
-	}
+	l := func(args ...sexp) sexp { return list(args...) }
+	s := func(x string) symbol { return symbol(x) }
+	n := func(x float64) number { return number(x) }
+	q := func(x string) sexp { return l(s("quote"), s(x)) }
 
 	srcs := []sexp{
 		&cell{
-			symbol("cons"),
+			s("cons"),
 			&cell{
-				symbol("a"),
-				&cell{symbol("b"), symNil},
+				q("a"),
+				&cell{q("b"), symNil},
 			},
 		},
+		cons(s("cons"), cons(q("a"), cons(q("b"), symNil))),
 		l(
-			symbol("cons"),
-			symbol("a"),
-			l(symbol("cons"), symbol("b"), l(symbol("quote"), symbol("c"))),
+			s("cons"),
+			q("a"),
+			l(s("cons"), q("b"), q("c")),
 		),
-		l(
-			symbol("quote"),
-			symbol("a"),
-		),
+		q("a"),
+		s("a"),
 		l(),
 		l(
-			symbol("cons"),
-			l(symbol("eq"), symbol("a"), symbol("a")),
-			l(symbol("eq"), symbol("b"), symbol("c")),
+			s("cons"),
+			l(s("eq"), q("a"), q("a")),
+			l(s("eq"), q("b"), q("c")),
 		),
 		l(
-			symbol("cond"),
-			l(l(symbol("eq"), symbol("a"), symbol("a")), symbol("b")),
-			l(symbol("t"), symbol("z")),
+			s("cond"),
+			l(l(s("eq"), q("a"), q("a")), q("b")),
+			l(s("t"), q("z")),
 		),
 		l(l(
-			symbol("lambda"),
-			l(symbol("a"), symbol("b")),
-			l(symbol("eq"), symbol("a"), symbol("b")),
-		), l(symbol("quote"), symbol("x")), l(symbol("quote"), symbol("x"))),
-		l(symbol("list"), number(10), number(20)),
-		l(symbol("eq"), number(10), number(10)),
-		l(symbol("+"), number(10), number(20)),
-		l(symbol("+"), number(10), l(symbol("-"), number(10), number(30))),
-		l(symbol("+"), number(10), l(symbol("quote"), symbol("x"))),
+			s("lambda"),
+			l(s("a"), s("b")),
+			l(s("eq"), s("a"), s("b")),
+		), l(s("quote"), s("x")), l(s("quote"), s("x"))),
+		l(s("list"), n(10), n(20)),
+		l(s("eq"), n(10), n(10)),
+		l(s("+"), n(10), n(20)),
+		l(s("+"), n(10), l(s("-"), n(10), n(30))),
+		l(s("+"), n(10), l(s("quote"), s("x"))),
 	}
 
+	env := newEnvironment()
 	for _, src := range srcs {
 		fmt.Println(src)
-		fmt.Println(src.Eval(newEnvironment()))
+		fmt.Println(src.Eval(env))
 		fmt.Println()
 	}
 }
