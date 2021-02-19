@@ -40,6 +40,7 @@ func main() {
 			l(symbol("a"), symbol("b")),
 			l(symbol("eq"), symbol("a"), symbol("b")),
 		), l(symbol("quote"), symbol("x")), l(symbol("quote"), symbol("x"))),
+		l(symbol("list"), number(10), number(20)),
 	}
 
 	for _, src := range srcs {

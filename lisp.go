@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type sexp interface {
@@ -22,6 +23,16 @@ func (sym symbol) Eval(env *environment) (sexp, error) {
 
 func (sym symbol) String() string {
 	return string(sym)
+}
+
+type number float64
+
+func (num number) Eval(env *environment) (sexp, error) {
+	return num, nil
+}
+
+func (num number) String() string {
+	return strconv.FormatFloat(float64(num), 'g', 16, 64)
 }
 
 type cell struct {
