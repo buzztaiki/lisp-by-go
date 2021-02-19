@@ -111,3 +111,27 @@ func cond(env *environment, args []sexp) (sexp, error) {
 func lambda(env *environment, args []sexp) (sexp, error) {
 	return cons(symLambda, list(args...)), nil
 }
+
+func plus(env *environment, args []sexp) (sexp, error) {
+	res := float64(0)
+	for i, x := range args {
+		num, ok := x.(number)
+		if !ok {
+			return nil, fmt.Errorf("args[%d]: wrong number type argument %v", i, x)
+		}
+		res += float64(num)
+	}
+	return number(res), nil
+}
+
+func minus(env *environment, args []sexp) (sexp, error) {
+	res := float64(0)
+	for i, x := range args {
+		num, ok := x.(number)
+		if !ok {
+			return nil, fmt.Errorf("args[%d]: wrong number type argument %v", i, x)
+		}
+		res -= float64(num)
+	}
+	return number(res), nil
+}

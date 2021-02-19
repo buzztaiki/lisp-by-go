@@ -17,6 +17,8 @@ func newEnvironment() *environment {
 			"car":    function(lispCar),
 			"cdr":    function(lispCdr),
 			"eq":     function(eq),
+			"+":      function(plus),
+			"-":      function(minus),
 			"quote":  specialForm(quote),
 			"cond":   specialForm(cond),
 			"lambda": specialForm(lambda),
