@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func ExampleEval() {
 	l := func(args ...sexp) sexp { return list(args...) }
@@ -99,7 +102,7 @@ func ExampleEval() {
 	// ==> 30
 	//
 	// (+ 10 (- 10 30))
-	// ==> -30
+	// ==> -10
 	//
 	// (+ 10 (quote x))
 	// error: args[1]: wrong number type argument x
@@ -112,4 +115,53 @@ func ExampleEval() {
 	//
 	// (f 3 4)
 	// error: wrong number of argument 2
+}
+
+func ExampleReplFib() {
+	src := `
+(defun fib (n)
+  (cond ((eq n 0) 0)
+        ((eq n 1) 1)
+        (t (+ (fib (- n 1)) (fib (- n 2))))))
+(fib 10)
+`
+	repl("", "==> ", strings.NewReader(src))
+	// Output:
+	// ==> fib
+	// ==> 55
+}
+
+func ExampleReplFizzBuzz() {
+	src := `
+(defun and (args)
+  (cond ((eq args nil) t)
+        ((car args) (and (cdr args)))
+        (t nil)))
+
+(defun fzbz (n max nfizz nbuzz)
+  (cond ((eq n max) nil)
+        ((and (list (eq nfizz 3) (eq nbuzz 5)))
+         (cons (quote fizzbuzz)
+               (fzbz (+ n 1) max 1 1)))
+        ((eq nfizz 3)
+         (cons (quote fizz)
+               (fzbz (+ n 1) max 1 (+ nbuzz 1))))
+        ((eq nbuzz 5)
+         (cons (quote buzz)
+               (fzbz (+ n 1) max (+ nfizz 1) 1)))
+        (t
+         (cons n
+               (fzbz (+ n 1) max (+ nfizz 1) (+ nbuzz 1))))))
+
+(defun fizzbuzz (n)
+  (fzbz 1 (+ n 1) 1 1))
+
+(fizzbuzz 20)
+`
+	repl("", "==> ", strings.NewReader(src))
+	// Output:
+	// ==> and
+	// ==> fzbz
+	// ==> fizzbuzz
+	// ==> (1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 fizz 13 14 fizzbuzz 16 17 fizz 19 buzz)
 }
