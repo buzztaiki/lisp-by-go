@@ -27,6 +27,7 @@ func (sym symbol) String() string {
 }
 
 const symNil = symbol("nil")
+const symTrue = symbol("t")
 
 type cell struct {
 	car sexp
@@ -44,6 +45,7 @@ func (c *cell) Eval() (sexp, error) {
 		"cons":  function(cons),
 		"car":   function(car),
 		"cdr":   function(cdr),
+		"eq":    function(eq),
 		"quote": specialForm(quote),
 	}
 

@@ -57,3 +57,15 @@ func quote(args ...sexp) (sexp, error) {
 	}
 	return args[0], nil
 }
+
+func eq(args ...sexp) (sexp, error) {
+	if err := checkArity(args, 2); err != nil {
+		return nil, err
+	}
+
+	if args[0] != args[1] {
+		return symNil, nil
+	}
+
+	return symTrue, nil
+}
