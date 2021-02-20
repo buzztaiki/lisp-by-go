@@ -1,13 +1,13 @@
 package main
 
 type environment struct {
-	funcs map[string]appliable
+	funcs map[string]function
 	vars  map[string]expr
 }
 
 func newEnvironment() *environment {
 	return &environment{
-		map[string]appliable{
+		map[string]function{
 			"cons":     builtinFunction(lispCons),
 			"list":     builtinFunction(lispList),
 			"car":      builtinFunction(lispCar),
@@ -30,7 +30,7 @@ func newEnvironment() *environment {
 }
 
 func (env *environment) clone() *environment {
-	newEnv := &environment{map[string]appliable{}, map[string]expr{}}
+	newEnv := &environment{map[string]function{}, map[string]expr{}}
 	for k, v := range env.funcs {
 		newEnv.funcs[k] = v
 	}

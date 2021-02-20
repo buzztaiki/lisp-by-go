@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func findFunction(env *environment, fnExpr expr) (appliable, error) {
+func findFunction(env *environment, fnExpr expr) (function, error) {
 	switch x := fnExpr.(type) {
 	case symbol:
 		fn := env.funcs[x.String()]
@@ -47,7 +47,7 @@ func apply(env *environment, fnExpr expr, args expr, shouldEvalArgs bool) (expr,
 	return res, nil
 }
 
-type appliable interface {
+type function interface {
 	Apply(env *environment, args expr) (expr, error)
 	ShouldEvalArgs() bool
 }
