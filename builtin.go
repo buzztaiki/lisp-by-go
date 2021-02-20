@@ -69,7 +69,7 @@ func cond(env *environment, args expr) (expr, error) {
 }
 
 func lambda(env *environment, args expr) (expr, error) {
-	return newLambdaFunction(symLambda.String(), args), nil
+	return newLambdaFunction(env, symLambda.String(), args), nil
 }
 
 func defun(env *environment, args expr) (expr, error) {
@@ -78,7 +78,7 @@ func defun(env *environment, args expr) (expr, error) {
 	}
 
 	name := car(args)
-	fn := newLambdaFunction(name.String(), cdr(args))
+	fn := newLambdaFunction(env, name.String(), cdr(args))
 	env.funcs[name.String()] = fn
 
 	return name, nil
@@ -90,7 +90,7 @@ func defmacro(env *environment, args expr) (expr, error) {
 	}
 
 	name := car(args)
-	fn := newMacroForm(name.String(), cdr(args))
+	fn := newMacroForm(env, name.String(), cdr(args))
 	env.funcs[name.String()] = fn
 
 	return name, nil

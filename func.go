@@ -42,12 +42,12 @@ func newSpecialForm(name string, fn function) *functionExpr {
 	return &functionExpr{name, fn, false}
 }
 
-func newLambdaFunction(name string, argsAndBody expr) *functionExpr {
+func newLambdaFunction(env *environment, name string, argsAndBody expr) *functionExpr {
 	varNames, body := car(argsAndBody), cdr(argsAndBody)
 
 	return &functionExpr{
 		name,
-		func(env *environment, args expr) (expr, error) {
+		func(_ *environment, args expr) (expr, error) {
 			newEnv, err := newEnvFromArgs(env, varNames, args)
 			if err != nil {
 				return nil, err
@@ -59,12 +59,12 @@ func newLambdaFunction(name string, argsAndBody expr) *functionExpr {
 	}
 }
 
-func newMacroForm(name string, argsAndBody expr) *functionExpr {
+func newMacroForm(env *environment, name string, argsAndBody expr) *functionExpr {
 	varNames, body := car(argsAndBody), cdr(argsAndBody)
 
 	return &functionExpr{
 		name,
-		func(env *environment, args expr) (expr, error) {
+		func(_ *environment, args expr) (expr, error) {
 			newEnv, err := newEnvFromArgs(env, varNames, args)
 			if err != nil {
 				return nil, err

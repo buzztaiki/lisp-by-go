@@ -80,7 +80,7 @@ func (c *cell) Apply(env *environment, args expr, shouldEvalArgs bool) (expr, er
 		return nil, fmt.Errorf("invalid function %v", c)
 	}
 
-	return newLambdaFunction(symLambda.String(), c.cdr).Apply(env, args, shouldEvalArgs)
+	return newLambdaFunction(env, symLambda.String(), c.cdr).Apply(env, args, shouldEvalArgs)
 }
 
 func (c *cell) String() string {
