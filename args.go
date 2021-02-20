@@ -16,6 +16,10 @@ func checkArity(args expr, n int) error {
 	return checkArityX(args, func() bool { return length(args) == n })
 }
 
+func checkArityGT(args expr, n int) error {
+	return checkArityX(args, func() bool { return length(args) > n })
+}
+
 func checkArityX(args expr, pred func() bool) error {
 	if !pred() {
 		return wronNumberOfArgumentError{length(args)}

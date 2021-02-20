@@ -137,7 +137,7 @@ func lambda(env *environment, args expr) (expr, error) {
 }
 
 func defun(env *environment, args expr) (expr, error) {
-	if err := checkArityX(args, func() bool { return length(args) > 1 }); err != nil {
+	if err := checkArityGT(args, 1); err != nil {
 		return nil, err
 	}
 
@@ -149,7 +149,7 @@ func defun(env *environment, args expr) (expr, error) {
 }
 
 func defmacro(env *environment, args expr) (expr, error) {
-	if err := checkArityX(args, func() bool { return length(args) > 1 }); err != nil {
+	if err := checkArityGT(args, 1); err != nil {
 		return nil, err
 	}
 
