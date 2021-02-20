@@ -35,24 +35,6 @@ type appliable interface {
 	Apply(env *environment, args expr) (expr, error)
 }
 
-func evalArgs(env *environment, args expr) (expr, error) {
-	return mapcar(func(x expr) (expr, error) {
-		return x.Eval(env)
-	}, args)
-}
-
-func newEnvFromArgs(env *environment, varNames expr, args expr) *environment {
-	newEnv := env.clone()
-	for args != symNil && varNames != symNil {
-		newEnv.vars[car(varNames).String()] = car(args)
-
-		args = cdr(args)
-		varNames = cdr(varNames)
-	}
-
-	return newEnv
-}
-
 type builtinFunction func(env *environment, args expr) (expr, error)
 
 func (fn builtinFunction) Apply(env *environment, args expr) (expr, error) {

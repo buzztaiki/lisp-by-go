@@ -4,17 +4,6 @@ import (
 	"fmt"
 )
 
-func checkArity(args expr, n int) error {
-	return checkArityX(args, func() bool { return length(args) == n })
-}
-
-func checkArityX(args expr, pred func() bool) error {
-	if !pred() {
-		return fmt.Errorf("wrong number of argument %d", length(args))
-	}
-	return nil
-}
-
 func length(xs expr) int {
 	if xs == symNil {
 		return 0
