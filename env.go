@@ -15,6 +15,7 @@ func newEnvironment() *environment {
 			"eq":       builtinFunction(eq),
 			"+":        builtinFunction(plus),
 			"-":        builtinFunction(minus),
+			"apply":    builtinFunction(lispApply),
 			"quote":    specialForm(quote),
 			"cond":     specialForm(cond),
 			"lambda":   specialForm(lambda),

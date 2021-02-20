@@ -192,3 +192,11 @@ func minus(env *environment, args expr) (expr, error) {
 	}
 	return number(res), nil
 }
+
+func lispApply(env *environment, args expr) (expr, error) {
+	if err := checkArityGT(args, 1); err != nil {
+		return nil, err
+	}
+
+	return apply(env, car(args), nth(1, args), false)
+}

@@ -45,7 +45,7 @@ type cell struct {
 }
 
 func (c *cell) Eval(env *environment) (expr, error) {
-	return apply(env, c.car, c.cdr)
+	return apply(env, c.car, c.cdr, true)
 }
 
 func (c *cell) stringNoParen() string {

@@ -182,3 +182,21 @@ func ExampleReplDefmacro() {
 	// ==> ok
 	// ==> ng
 }
+
+func ExampleReplRestApply() {
+	src := `
+(defun my-append (&rest seqs)
+  (cond ((eq seqs nil) nil)
+        ((eq (car seqs) nil) (apply 'my-append (cdr seqs)))
+        (t (cons (car (car seqs))
+                 (apply 'my-append (cons (cdr (car seqs))
+                                         (cdr seqs)))))))
+
+
+(my-append '(1 2 3) '(4 5 6) '(7 8 9))
+`
+	repl("", "==> ", strings.NewReader(src))
+	// Output:
+	// ==> my-append
+	// ==> (1 2 3 4 5 6 7 8 9)
+}
