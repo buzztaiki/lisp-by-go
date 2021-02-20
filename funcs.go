@@ -159,6 +159,18 @@ func defun(env *environment, args expr) (expr, error) {
 	return name, nil
 }
 
+func defmacro(env *environment, args expr) (expr, error) {
+	if err := checkArityX(args, func() bool { return length(args) > 1 }); err != nil {
+		return nil, err
+	}
+
+	name := car(args)
+	fn := newMacroForm(cdr(args))
+	env.funcs[name.String()] = fn
+
+	return name, nil
+}
+
 func plus(env *environment, args expr) (expr, error) {
 	res := float64(0)
 	for ; args != symNil; args = cdr(args) {

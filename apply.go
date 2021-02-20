@@ -41,6 +41,18 @@ func evalArgs(env *environment, args expr) (expr, error) {
 	}, args)
 }
 
+func newEnvFromArgs(env *environment, varNames expr, args expr) *environment {
+	newEnv := env.clone()
+	for args != symNil && varNames != symNil {
+		newEnv.vars[car(varNames).String()] = car(args)
+
+		args = cdr(args)
+		varNames = cdr(varNames)
+	}
+
+	return newEnv
+}
+
 type builtinFunction func(env *environment, args expr) (expr, error)
 
 func (fn builtinFunction) Apply(env *environment, args expr) (expr, error) {
@@ -78,14 +90,29 @@ func (fn lambdaFunction) Apply(env *environment, args expr) (expr, error) {
 		return nil, err
 	}
 
-	newEnv := env.clone()
-	varNames := fn.varNames
-	for newArgs != symNil && varNames != symNil {
-		newEnv.vars[car(varNames).String()] = car(newArgs)
+	newEnv := newEnvFromArgs(env, fn.varNames, newArgs)
+	return car(fn.body).Eval(newEnv)
+}
 
-		newArgs = cdr(newArgs)
-		varNames = cdr(varNames)
+type macroForm struct {
+	varNames expr
+	body     expr
+}
+
+func newMacroForm(argsAndBody expr) *macroForm {
+	return &macroForm{car(argsAndBody), cdr(argsAndBody)}
+}
+
+func (fn macroForm) Apply(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, length(fn.varNames)); err != nil {
+		return nil, err
 	}
 
-	return car(fn.body).Eval(newEnv)
+	newEnv := newEnvFromArgs(env, fn.varNames, args)
+	expanded, err := car(fn.body).Eval(newEnv)
+	if err != nil {
+		return nil, fmt.Errorf("macro expantion: %w", err)
+	}
+
+	return expanded.Eval(env)
 }
