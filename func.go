@@ -8,7 +8,7 @@ type function func(env *environment, args expr) (expr, error)
 
 type functionExpr struct {
 	name           string
-	fn             func(env *environment, args expr) (expr, error)
+	fn             function
 	shouldEvalArgs bool
 }
 
