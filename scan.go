@@ -8,11 +8,17 @@ import (
 )
 
 type scanner struct {
-	src io.RuneScanner
+	src      io.RuneScanner
+	prefixes map[rune]bool
 }
 
-func newScanner(src io.Reader) *scanner {
-	return &scanner{bufio.NewReader(src)}
+func newScanner(src io.Reader, prefixes []rune) *scanner {
+	ps := map[rune]bool{}
+	for _, k := range prefixes {
+		ps[k] = true
+	}
+
+	return &scanner{bufio.NewReader(src), ps}
 }
 
 func (sc *scanner) scan() (string, error) {
@@ -25,12 +31,12 @@ func (sc *scanner) scan() (string, error) {
 		return string(c), nil
 	}
 
-	if c == '\'' {
+	if _, ok := sc.prefixes[c]; ok {
 		tok, err := sc.scan()
 		if err != nil {
 			return "", err
 		}
-		return "'" + tok, nil
+		return string(c) + tok, nil
 
 	}
 
@@ -61,7 +67,8 @@ func (sc *scanner) scanToken(head rune) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if unicode.IsSpace(c) || c == '(' || c == ')' || c == '\'' {
+		_, ok := sc.prefixes[c]
+		if unicode.IsSpace(c) || c == '(' || c == ')' || ok {
 			sc.src.UnreadRune()
 			return buf.String(), nil
 		}

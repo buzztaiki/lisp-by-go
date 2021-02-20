@@ -3,16 +3,20 @@ package main
 import (
 	"io"
 	"strconv"
-	"strings"
 )
 
 type parser struct {
-	scanner *scanner
-	backlog string
+	scanner     *scanner
+	backlog     string
+	translators map[rune]translator
 }
 
 func newParser(src io.Reader) *parser {
-	return &parser{newScanner(src), ""}
+	translators := map[rune]translator{
+		'\'': quoteTranslator,
+	}
+
+	return &parser{newScanner(src, []rune{'\''}), "", translators}
 }
 
 func (p *parser) parse() (expr, error) {
@@ -39,26 +43,20 @@ func (p *parser) parseSexp() (expr, error) {
 		return nil, err
 	}
 
-	fn := func(token string) (expr, error) {
-		if token == "(" {
-			return p.parseList()
-		}
-		if n, err := strconv.ParseFloat(token, 64); err == nil {
-			return number(n), nil
-		}
-		return symbol(token), nil
+	tokenRunes := []rune(token)
+	prefix := tokenRunes[0]
+	if trans, ok := p.translators[prefix]; ok {
+		p.unscan(string(tokenRunes[1:]))
+		return trans(p.parseSexp)
 	}
 
-	quoted := strings.HasPrefix(token, "'")
-	if !quoted {
-		return fn(token)
+	if token == "(" {
+		return p.parseList()
 	}
-
-	res, err := fn(token[1:])
-	if err != nil {
-		return nil, err
+	if n, err := strconv.ParseFloat(token, 64); err == nil {
+		return number(n), nil
 	}
-	return list(symbol("quote"), res), nil
+	return symbol(token), nil
 }
 
 func (p *parser) parseList() (expr, error) {

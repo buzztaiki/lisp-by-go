@@ -8,6 +8,8 @@ import (
 )
 
 func TestScanner(t *testing.T) {
+	prefixes := []rune{'\'', '`'}
+
 	cases := []struct {
 		src      string
 		expected []string
@@ -18,11 +20,12 @@ func TestScanner(t *testing.T) {
 		{`a<b a-z :name`, []string{"a<b", "a-z", ":name"}},
 		{`"a b c"`, []string{`"a`, `b`, `c"`}}, // とりあえず文字列はなし
 		{"'(a b) 'a 'x'y", []string{"'(", "a", "b", ")", "'a", "'x", "'y"}},
+		{"`(a b) `a `'a", []string{"`(", "a", "b", ")", "`a", "`'a"}},
 	}
 
 	for _, c := range cases {
 		t.Run("case:"+c.src, func(t *testing.T) {
-			sc := newScanner(strings.NewReader(c.src))
+			sc := newScanner(strings.NewReader(c.src), prefixes)
 			toks := []string{}
 			for {
 				tok, err := sc.scan()
