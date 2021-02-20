@@ -1,27 +1,31 @@
 package main
 
 type environment struct {
-	funcs map[string]function
+	funcs map[string]expr
 	vars  map[string]expr
 }
 
 func newEnvironment() *environment {
+	funcs := map[string]expr{}
+	addFunc := func(name string, fn function) { funcs[name] = newBuiltinFunction(name, fn) }
+	addSpForm := func(name string, fn function) { funcs[name] = newSpecialForm(name, fn) }
+
+	addFunc("cons", lispCons)
+	addFunc("list", lispList)
+	addFunc("car", lispCar)
+	addFunc("cdr", lispCdr)
+	addFunc("eq", eq)
+	addFunc("+", plus)
+	addFunc("-", minus)
+	addFunc("apply", lispApply)
+	addSpForm("quote", quote)
+	addSpForm("cond", cond)
+	addSpForm("lambda", lambda)
+	addSpForm("defun", defun)
+	addSpForm("defmacro", defmacro)
+
 	return &environment{
-		map[string]function{
-			"cons":     builtinFunction(lispCons),
-			"list":     builtinFunction(lispList),
-			"car":      builtinFunction(lispCar),
-			"cdr":      builtinFunction(lispCdr),
-			"eq":       builtinFunction(eq),
-			"+":        builtinFunction(plus),
-			"-":        builtinFunction(minus),
-			"apply":    builtinFunction(lispApply),
-			"quote":    specialForm(quote),
-			"cond":     specialForm(cond),
-			"lambda":   specialForm(lambda),
-			"defun":    specialForm(defun),
-			"defmacro": specialForm(defmacro),
-		},
+		funcs,
 		map[string]expr{
 			symNil.String():  symNil,
 			symTrue.String(): symTrue,
@@ -30,7 +34,7 @@ func newEnvironment() *environment {
 }
 
 func (env *environment) clone() *environment {
-	newEnv := &environment{map[string]function{}, map[string]expr{}}
+	newEnv := &environment{map[string]expr{}, map[string]expr{}}
 	for k, v := range env.funcs {
 		newEnv.funcs[k] = v
 	}

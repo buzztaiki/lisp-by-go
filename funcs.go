@@ -133,7 +133,7 @@ func cond(env *environment, args expr) (expr, error) {
 }
 
 func lambda(env *environment, args expr) (expr, error) {
-	return cons(symLambda, args), nil
+	return newLambdaFunction(symLambda.String(), args), nil
 }
 
 func defun(env *environment, args expr) (expr, error) {
@@ -142,7 +142,7 @@ func defun(env *environment, args expr) (expr, error) {
 	}
 
 	name := car(args)
-	fn := newLambdaFunction(cdr(args))
+	fn := newLambdaFunction(name.String(), cdr(args))
 	env.funcs[name.String()] = fn
 
 	return name, nil
@@ -154,7 +154,7 @@ func defmacro(env *environment, args expr) (expr, error) {
 	}
 
 	name := car(args)
-	fn := newMacroForm(cdr(args))
+	fn := newMacroForm(name.String(), cdr(args))
 	env.funcs[name.String()] = fn
 
 	return name, nil
@@ -198,5 +198,5 @@ func lispApply(env *environment, args expr) (expr, error) {
 		return nil, err
 	}
 
-	return apply(env, car(args), nth(1, args), false)
+	return car(args).Apply(env, nth(1, args), false)
 }
