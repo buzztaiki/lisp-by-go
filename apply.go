@@ -63,16 +63,16 @@ func newLambdaFunction(argsAndBody expr) *lambdaFunction {
 }
 
 func (fn lambdaFunction) Apply(env *environment, args expr) (expr, error) {
-	if err := checkArity(args, length(fn.varNames)); err != nil {
-		return nil, err
-	}
-
 	newArgs, err := evalArgs(env, args)
 	if err != nil {
 		return nil, err
 	}
 
-	newEnv := newEnvFromArgs(env, fn.varNames, newArgs)
+	newEnv, err := newEnvFromArgs(env, fn.varNames, newArgs)
+	if err != nil {
+		return nil, err
+	}
+
 	return car(fn.body).Eval(newEnv)
 }
 
@@ -86,11 +86,11 @@ func newMacroForm(argsAndBody expr) *macroForm {
 }
 
 func (fn macroForm) Apply(env *environment, args expr) (expr, error) {
-	if err := checkArity(args, length(fn.varNames)); err != nil {
+	newEnv, err := newEnvFromArgs(env, fn.varNames, args)
+	if err != nil {
 		return nil, err
 	}
 
-	newEnv := newEnvFromArgs(env, fn.varNames, args)
 	expanded, err := car(fn.body).Eval(newEnv)
 	if err != nil {
 		return nil, fmt.Errorf("macro expantion: %w", err)
