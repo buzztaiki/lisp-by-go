@@ -21,12 +21,12 @@ func TestNewEnvFromArgs(t *testing.T) {
 			list(symbol("x")),
 			list(symbol("a"), symbol("b")),
 			nil,
-			wronNumberOfArgumentError{2}},
+			wronNumberOfArgumentError(2)},
 		{"too short",
 			list(symbol("x")),
 			list(),
 			nil,
-			wronNumberOfArgumentError{0}},
+			wronNumberOfArgumentError(0)},
 		{"optional",
 			list(symbol("x"), symbol("&optional"), symbol("y"), symbol("z")),
 			list(symbol("a"), symbol("b")),
@@ -55,7 +55,7 @@ func TestNewEnvFromArgs(t *testing.T) {
 			env.vars = map[string]expr{}
 			newEnv, err := newEnvFromArgs(env, c.varNames, c.args)
 			if err != nil {
-				if err != c.err {
+				if err.Error() != c.err.Error() {
 					t.Errorf("got error %v, want %v", err, c.err)
 				}
 				return

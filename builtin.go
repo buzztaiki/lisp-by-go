@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 func fnCar(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
@@ -99,9 +95,9 @@ func fnDefmacro(env *environment, args expr) (expr, error) {
 func fnPlus(env *environment, args expr) (expr, error) {
 	res := float64(0)
 	for ; args != symNil; args = cdr(args) {
-		num, ok := car(args).(number)
-		if !ok {
-			return nil, fmt.Errorf("wrong number type argument %v", car(args))
+		num, err := checkNumber(car(args))
+		if err != nil {
+			return nil, err
 		}
 		res += float64(num)
 	}
@@ -114,9 +110,9 @@ func fnMinus(env *environment, args expr) (expr, error) {
 	res := float64(0)
 
 	for i := 0; args != symNil; args = cdr(args) {
-		num, ok := car(args).(number)
-		if !ok {
-			return nil, fmt.Errorf("wrong number type argument %v", car(args))
+		num, err := checkNumber(car(args))
+		if err != nil {
+			return nil, err
 		}
 
 		// 引数が複数ある場合は最初の値をひっくりかえす
@@ -127,6 +123,27 @@ func fnMinus(env *environment, args expr) (expr, error) {
 		i++
 	}
 	return number(res), nil
+}
+
+func makeNumberCmp(pred func(a, b number) bool) function {
+	return func(env *environment, args expr) (expr, error) {
+		if err := checkArity(args, 2); err != nil {
+			return nil, err
+		}
+
+		a, err := checkNumber(car(args))
+		if err != nil {
+			return nil, err
+		}
+		b, err := checkNumber(cdr(args))
+		if err != nil {
+			return nil, err
+		}
+		if pred(a, b) {
+			return symTrue, nil
+		}
+		return symNil, nil
+	}
 }
 
 func fnLispApply(env *environment, args expr) (expr, error) {

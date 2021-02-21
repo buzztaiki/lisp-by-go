@@ -4,12 +4,12 @@ import (
 	"fmt"
 )
 
-type wronNumberOfArgumentError struct {
-	nargs int
+func wronNumberOfArgumentError(nargs int) error {
+	return fmt.Errorf("wrong number of argument %d", nargs)
 }
 
-func (err wronNumberOfArgumentError) Error() string {
-	return fmt.Sprintf("wrong number of argument %d", err.nargs)
+func wrongNumberTypeArgumentError(arg expr) error {
+	return fmt.Errorf("wrong number type argument %v", arg)
 }
 
 func checkArity(args expr, n int) error {
@@ -22,9 +22,17 @@ func checkArityGT(args expr, n int) error {
 
 func checkArityX(args expr, pred func() bool) error {
 	if !pred() {
-		return wronNumberOfArgumentError{length(args)}
+		return wronNumberOfArgumentError(length(args))
 	}
 	return nil
+}
+
+func checkNumber(arg expr) (number, error) {
+	num, ok := arg.(number)
+	if !ok {
+		return number(0), wrongNumberTypeArgumentError(arg)
+	}
+	return num, nil
 }
 
 func newEnvFromArgs(env *environment, varNames expr, args expr) (*environment, error) {
@@ -44,7 +52,7 @@ func newEnvFromArgs(env *environment, varNames expr, args expr) (*environment, e
 		}
 
 		if args == symNil && !optional {
-			return nil, wronNumberOfArgumentError{nargs}
+			return nil, wronNumberOfArgumentError(nargs)
 		}
 
 		newEnv.vars[car(varNames).String()] = car(args)
@@ -53,8 +61,7 @@ func newEnvFromArgs(env *environment, varNames expr, args expr) (*environment, e
 	}
 
 	if args != symNil {
-		return nil, wronNumberOfArgumentError{nargs}
+		return nil, wronNumberOfArgumentError(nargs)
 	}
-
 	return newEnv, nil
 }
