@@ -48,12 +48,12 @@ func newLambdaFunction(env *environment, name string, argsAndBody expr) *functio
 	return &functionExpr{
 		name,
 		func(_ *environment, args expr) (expr, error) {
-			newEnv, err := newEnvFromArgs(env, varNames, args)
+			argsEnv, err := newEnvFromArgs(env, varNames, args)
 			if err != nil {
 				return nil, err
 			}
 
-			return car(body).Eval(newEnv)
+			return car(body).Eval(argsEnv)
 		},
 		true,
 	}
@@ -64,18 +64,18 @@ func newMacroForm(env *environment, name string, argsAndBody expr) *functionExpr
 
 	return &functionExpr{
 		name,
-		func(_ *environment, args expr) (expr, error) {
-			newEnv, err := newEnvFromArgs(env, varNames, args)
+		func(evalEnv *environment, args expr) (expr, error) {
+			argsEnv, err := newEnvFromArgs(env, varNames, args)
 			if err != nil {
 				return nil, err
 			}
 
-			expanded, err := car(body).Eval(newEnv)
+			expanded, err := car(body).Eval(argsEnv)
 			if err != nil {
 				return nil, fmt.Errorf("macro expantion: %w", err)
 			}
 
-			return expanded.Eval(env)
+			return expanded.Eval(evalEnv)
 		},
 		false,
 	}
