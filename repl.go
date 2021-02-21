@@ -17,11 +17,13 @@ func repl(prompt, rprompt string, r io.Reader) {
 		}
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "read error:", err)
+			continue
 		}
 
 		res, err := expr.Eval(env)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "eval error:", err)
+			continue
 		}
 		fmt.Print(rprompt)
 		fmt.Println(res)
