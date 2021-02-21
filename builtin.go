@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func boolToExpr(x bool) expr {
 	if x {
@@ -255,4 +257,23 @@ func fnFunction(env *environment, args expr) (expr, error) {
 	}
 
 	return fn, nil
+}
+
+func fnLet(env *environment, args expr) (expr, error) {
+	if err := checkArityGT(args, 1); err != nil {
+		return nil, err
+	}
+
+	// (let ((a 1) (b 2)) (+ a b))
+	varList, body := car(args), cdr(args)
+	newEnv := env.clone()
+	for ; varList != symNil; varList = cdr(varList) {
+		x := car(varList)
+		if consp(x) {
+			newEnv.vars[car(x).String()] = nth(1, x)
+		} else {
+			newEnv.vars[x.String()] = symNil
+		}
+	}
+	return car(body).Eval(newEnv)
 }
