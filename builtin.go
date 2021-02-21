@@ -115,37 +115,28 @@ func fnDefmacro(env *environment, args expr) (expr, error) {
 	return name, nil
 }
 
-func fnPlus(env *environment, args expr) (expr, error) {
-	res := float64(0)
-	for ; args != symNil; args = cdr(args) {
-		num, err := checkNumber(car(args))
-		if err != nil {
-			return nil, err
+func makeNumberAccum(first number, fn func(res, x number) number) function {
+	return func(env *environment, args expr) (expr, error) {
+		res := first
+		if length(args) > 1 {
+			num, err := checkNumber(car(args))
+			if err != nil {
+				return nil, err
+			}
+			res = num
+			args = cdr(args)
 		}
-		res += float64(num)
+
+		for ; args != symNil; args = cdr(args) {
+			num, err := checkNumber(car(args))
+			if err != nil {
+				return nil, err
+			}
+
+			res = fn(res, num)
+		}
+		return res, nil
 	}
-	return number(res), nil
-}
-
-// 引数が 1 つの場合はその負数を返す。
-// 二つ以上の場合は引き算する。
-func fnMinus(env *environment, args expr) (expr, error) {
-	res := float64(0)
-
-	for i := 0; args != symNil; args = cdr(args) {
-		num, err := checkNumber(car(args))
-		if err != nil {
-			return nil, err
-		}
-
-		// 引数が複数ある場合は最初の値をひっくりかえす
-		if i == 1 {
-			res *= -1
-		}
-		res -= float64(num)
-		i++
-	}
-	return number(res), nil
 }
 
 func makeNumberCmp(pred func(a, b number) bool) function {
@@ -158,7 +149,7 @@ func makeNumberCmp(pred func(a, b number) bool) function {
 		if err != nil {
 			return nil, err
 		}
-		b, err := checkNumber(cdr(args))
+		b, err := checkNumber(car(cdr(args)))
 		if err != nil {
 			return nil, err
 		}
