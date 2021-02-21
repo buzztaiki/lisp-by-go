@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func boolToExpr(x bool) expr {
 	if x {
 		return symTrue
@@ -240,4 +242,17 @@ func backquoteDoUnquote(env *environment, x expr) (expr, error) {
 	}
 
 	return list(xs...), nil
+}
+
+func fnFunction(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, 1); err != nil {
+		return nil, err
+	}
+
+	fn, ok := env.funcs[car(args).String()]
+	if !ok {
+		return nil, fmt.Errorf("function %v not found", car(args))
+	}
+
+	return fn, nil
 }

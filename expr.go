@@ -23,8 +23,8 @@ func (sym symbol) Eval(env *environment) (expr, error) {
 }
 
 func (sym symbol) Apply(env *environment, args expr, shouldEvalArgs bool) (expr, error) {
-	fn := env.funcs[sym.String()]
-	if fn == nil {
+	fn, ok := env.funcs[sym.String()]
+	if !ok {
 		return nil, fmt.Errorf("function %v not found", sym)
 	}
 
