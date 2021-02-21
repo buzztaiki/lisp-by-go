@@ -19,6 +19,7 @@ func newEnvironment() *environment {
 	addFunc("-", minus)
 	addFunc("apply", lispApply)
 	addSpForm("quote", quote)
+	addSpForm("backquote", backquote)
 	addSpForm("cond", cond)
 	addSpForm("lambda", lambda)
 	addSpForm("defun", defun)

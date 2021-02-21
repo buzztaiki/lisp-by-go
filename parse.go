@@ -14,9 +14,11 @@ type parser struct {
 func newParser(src io.Reader) *parser {
 	translators := map[rune]translator{
 		'\'': quoteTranslator,
+		'`':  backquoteTranslator,
+		',':  unquoteTranslator,
 	}
 
-	return &parser{newScanner(src, []rune{'\''}), "", translators}
+	return &parser{newScanner(src, []rune{'\'', '`', ','}), "", translators}
 }
 
 func (p *parser) parse() (expr, error) {

@@ -3,7 +3,6 @@
 Lisp implementation by golang for my interest.
 
 ## TODO
-- backquote
 - string
 - implement more functions
 
@@ -25,9 +24,9 @@ go run .
 % go run .
 >
 (defmacro my-if (cond then else)
-  (list 'cond
-        (list cond then)
-        (list t else)))
+  `(cond
+    (,cond ,then)
+    (t ,else)))
 ==> my-if
 > (my-if (eq 1 1) 'ok moo)
 ==> ok

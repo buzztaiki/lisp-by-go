@@ -136,3 +136,50 @@ func lispApply(env *environment, args expr) (expr, error) {
 
 	return car(args).Apply(env, nth(1, args), false)
 }
+
+func backquote(env *environment, args expr) (expr, error) {
+	return backquoteDoUnquote(env, car(args))
+}
+
+func backquoteDoUnquote(env *environment, x expr) (expr, error) {
+	if atomp(x) {
+		return x, nil
+	}
+	if x == symNil {
+		return x, nil
+	}
+
+	xs := []expr{}
+	for ; x != symNil; x = cdr(x) {
+		head := car(x)
+		// `(,'a) => '((, 'a)) => '(a)
+		if car(head) == symbol(",") && nth(1, head) != symbol("@") {
+			x1, err := nth(1, head).Eval(env)
+			if err != nil {
+				return nil, err
+			}
+			xs = append(xs, x1)
+			continue
+		}
+		// `(a ,@'(b)) => `(a (, @) '(b)) => '(a b)
+		if car(head) == symbol(",") && nth(1, head) == symbol("@") {
+			x = cdr(x)
+			x1, err := car(x).Eval(env)
+			if err != nil {
+				return nil, err
+			}
+			for ; x1 != symNil; x1 = cdr(x1) {
+				xs = append(xs, car(x1))
+			}
+			continue
+		}
+
+		x1, err := backquoteDoUnquote(env, head)
+		if err != nil {
+			return nil, err
+		}
+		xs = append(xs, x1)
+	}
+
+	return list(xs...), nil
+}

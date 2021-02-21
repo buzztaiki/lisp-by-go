@@ -67,3 +67,16 @@ func mapcar(fn func(x expr) (expr, error), xs expr) (expr, error) {
 
 	return res2, nil
 }
+
+func consp(x expr) bool {
+	_, ok := x.(*cell)
+	return ok
+}
+
+func listp(x expr) bool {
+	return consp(x) || x == symNil
+}
+
+func atomp(x expr) bool {
+	return !consp(x)
+}
