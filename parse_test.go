@@ -17,6 +17,7 @@ func TestParser(t *testing.T) {
 		{"'a", list(symbol("quote"), symbol("a"))},
 		{"'(a b)", list(symbol("quote"), list(symbol("a"), symbol("b")))},
 		{"(a b . c)", cons(symbol("a"), cons(symbol("b"), symbol("c")))},
+		{"`'(a b)", list(symbol("backquote"), list(symbol("quote"), list(symbol("a"), symbol("b"))))},
 	}
 
 	for _, c := range cases {

@@ -19,8 +19,8 @@ func TestScanner(t *testing.T) {
 		{`(a (word 101 "moo"))`, []string{"(", "a", "(", "word", "101", `"moo"`, ")", ")"}},
 		{`a<b a-z :name`, []string{"a<b", "a-z", ":name"}},
 		{`"a b c"`, []string{`"a`, `b`, `c"`}}, // とりあえず文字列はなし
-		{"'(a b) 'a 'x'y", []string{"'(", "a", "b", ")", "'a", "'x", "'y"}},
-		{"`(a b) `a `'a", []string{"`(", "a", "b", ")", "`a", "`'a"}},
+		{"'(a b) 'a 'x'y", []string{"'", "(", "a", "b", ")", "'", "a", "'", "x", "'", "y"}},
+		{"`'a", []string{"`", "'", "a"}},
 	}
 
 	for _, c := range cases {

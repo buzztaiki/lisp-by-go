@@ -35,7 +35,6 @@ func (p *parser) scan() (string, error) {
 }
 
 func (p *parser) unscan(token string) {
-
 	p.backlog = token
 }
 
@@ -46,10 +45,11 @@ func (p *parser) parseSexp() (expr, error) {
 	}
 
 	tokenRunes := []rune(token)
-	prefix := tokenRunes[0]
-	if trans, ok := p.translators[prefix]; ok {
-		p.unscan(string(tokenRunes[1:]))
-		return trans(p.parseSexp)
+	if len(tokenRunes) == 1 {
+		prefix := tokenRunes[0]
+		if trans, ok := p.translators[prefix]; ok {
+			return trans(p.parseSexp)
+		}
 	}
 
 	if token == "(" {

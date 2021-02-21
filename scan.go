@@ -27,17 +27,9 @@ func (sc *scanner) scan() (string, error) {
 		return "", err
 	}
 
-	if c == '(' || c == ')' {
+	_, isPrefix := sc.prefixes[c]
+	if c == '(' || c == ')' || isPrefix {
 		return string(c), nil
-	}
-
-	if _, ok := sc.prefixes[c]; ok {
-		tok, err := sc.scan()
-		if err != nil {
-			return "", err
-		}
-		return string(c) + tok, nil
-
 	}
 
 	return sc.scanToken(c)
@@ -67,8 +59,8 @@ func (sc *scanner) scanToken(head rune) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		_, ok := sc.prefixes[c]
-		if unicode.IsSpace(c) || c == '(' || c == ')' || ok {
+		_, isPrefix := sc.prefixes[c]
+		if unicode.IsSpace(c) || c == '(' || c == ')' || isPrefix {
 			sc.src.UnreadRune()
 			return buf.String(), nil
 		}
