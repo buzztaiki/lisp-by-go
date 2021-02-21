@@ -16,9 +16,10 @@ func newParser(src io.Reader) *parser {
 		'\'': quoteTranslator,
 		'`':  backquoteTranslator,
 		',':  unquoteTranslator,
+		'#':  hashTranslator,
 	}
 
-	return &parser{newScanner(src, []rune{'\'', '`', ','}), "", translators}
+	return &parser{newScanner(src, []rune{'\'', '`', ',', '#'}), "", translators}
 }
 
 func (p *parser) parse() (expr, error) {
