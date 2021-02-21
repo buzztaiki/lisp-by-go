@@ -48,6 +48,36 @@ func fnEq(env *environment, args expr) (expr, error) {
 	return boolToExpr(nth(0, args) == nth(1, args)), nil
 }
 
+func fnAnd(env *environment, args expr) (expr, error) {
+	last := expr(symNil)
+	for ; args != symNil; args = cdr(args) {
+		x, err := car(args).Eval(env)
+		if err != nil {
+			return nil, err
+		}
+
+		if x == symNil {
+			return symNil, nil
+		}
+		last = x
+	}
+	return last, nil
+}
+
+func fnOr(env *environment, args expr) (expr, error) {
+	for ; args != symNil; args = cdr(args) {
+		x, err := car(args).Eval(env)
+		if err != nil {
+			return nil, err
+		}
+
+		if x != symNil {
+			return x, nil
+		}
+	}
+	return symNil, nil
+}
+
 func fnConsp(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err

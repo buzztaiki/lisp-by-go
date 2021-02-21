@@ -34,6 +34,8 @@ func newEnvironment() *environment {
 	addSpForm("lambda", fnLambda)
 	addSpForm("defun", fnDefun)
 	addSpForm("defmacro", fnDefmacro)
+	addSpForm("and", fnAnd)
+	addSpForm("or", fnOr)
 
 	return &environment{
 		funcs,
