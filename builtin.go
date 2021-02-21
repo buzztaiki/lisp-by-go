@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func lispCar(env *environment, args expr) (expr, error) {
+func fnCar(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -12,7 +12,7 @@ func lispCar(env *environment, args expr) (expr, error) {
 	return car(car(args)), nil
 }
 
-func lispCdr(env *environment, args expr) (expr, error) {
+func fnCdr(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
@@ -20,25 +20,25 @@ func lispCdr(env *environment, args expr) (expr, error) {
 	return cdr(car(args)), nil
 }
 
-func lispCons(env *environment, args expr) (expr, error) {
+func fnCons(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
 	return cons(nth(0, args), nth(1, args)), nil
 }
 
-func lispList(env *environment, args expr) (expr, error) {
+func fnList(env *environment, args expr) (expr, error) {
 	return args, nil
 }
 
-func quote(env *environment, args expr) (expr, error) {
+func fnQuote(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
 	}
 	return car(args), nil
 }
 
-func eq(env *environment, args expr) (expr, error) {
+func fnEq(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func eq(env *environment, args expr) (expr, error) {
 	return symTrue, nil
 }
 
-func cond(env *environment, args expr) (expr, error) {
+func fnCond(env *environment, args expr) (expr, error) {
 	for ; args != symNil; args = cdr(args) {
 		clause := car(args)
 		cond, body := car(clause), cdr(clause)
@@ -68,11 +68,11 @@ func cond(env *environment, args expr) (expr, error) {
 	return symNil, nil
 }
 
-func lambda(env *environment, args expr) (expr, error) {
+func fnLambda(env *environment, args expr) (expr, error) {
 	return newLambdaFunction(env, symLambda.String(), args), nil
 }
 
-func defun(env *environment, args expr) (expr, error) {
+func fnDefun(env *environment, args expr) (expr, error) {
 	if err := checkArityGT(args, 1); err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func defun(env *environment, args expr) (expr, error) {
 	return name, nil
 }
 
-func defmacro(env *environment, args expr) (expr, error) {
+func fnDefmacro(env *environment, args expr) (expr, error) {
 	if err := checkArityGT(args, 1); err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func defmacro(env *environment, args expr) (expr, error) {
 	return name, nil
 }
 
-func plus(env *environment, args expr) (expr, error) {
+func fnPlus(env *environment, args expr) (expr, error) {
 	res := float64(0)
 	for ; args != symNil; args = cdr(args) {
 		num, ok := car(args).(number)
@@ -110,7 +110,7 @@ func plus(env *environment, args expr) (expr, error) {
 
 // 引数が 1 つの場合はその負数を返す。
 // 二つ以上の場合は引き算する。
-func minus(env *environment, args expr) (expr, error) {
+func fnMinus(env *environment, args expr) (expr, error) {
 	res := float64(0)
 
 	for i := 0; args != symNil; args = cdr(args) {
@@ -129,7 +129,7 @@ func minus(env *environment, args expr) (expr, error) {
 	return number(res), nil
 }
 
-func lispApply(env *environment, args expr) (expr, error) {
+func fnLispApply(env *environment, args expr) (expr, error) {
 	if err := checkArityGT(args, 1); err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func lispApply(env *environment, args expr) (expr, error) {
 	return car(args).Apply(env, nth(1, args), false)
 }
 
-func backquote(env *environment, args expr) (expr, error) {
+func fnBackquote(env *environment, args expr) (expr, error) {
 	return backquoteDoUnquote(env, car(args))
 }
 

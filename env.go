@@ -10,20 +10,20 @@ func newEnvironment() *environment {
 	addFunc := func(name string, fn function) { funcs[name] = newBuiltinFunction(name, fn) }
 	addSpForm := func(name string, fn function) { funcs[name] = newSpecialForm(name, fn) }
 
-	addFunc("cons", lispCons)
-	addFunc("list", lispList)
-	addFunc("car", lispCar)
-	addFunc("cdr", lispCdr)
-	addFunc("eq", eq)
-	addFunc("+", plus)
-	addFunc("-", minus)
-	addFunc("apply", lispApply)
-	addSpForm("quote", quote)
-	addSpForm("backquote", backquote)
-	addSpForm("cond", cond)
-	addSpForm("lambda", lambda)
-	addSpForm("defun", defun)
-	addSpForm("defmacro", defmacro)
+	addFunc("cons", fnCons)
+	addFunc("list", fnList)
+	addFunc("car", fnCar)
+	addFunc("cdr", fnCdr)
+	addFunc("eq", fnEq)
+	addFunc("+", fnPlus)
+	addFunc("-", fnMinus)
+	addFunc("apply", fnLispApply)
+	addSpForm("quote", fnQuote)
+	addSpForm("backquote", fnBackquote)
+	addSpForm("cond", fnCond)
+	addSpForm("lambda", fnLambda)
+	addSpForm("defun", fnDefun)
+	addSpForm("defmacro", fnDefmacro)
 
 	return &environment{
 		funcs,
