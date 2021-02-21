@@ -1,5 +1,12 @@
 package main
 
+func boolToExpr(x bool) expr {
+	if x {
+		return symTrue
+	}
+	return symNil
+}
+
 func fnCar(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 1); err != nil {
 		return nil, err
@@ -38,12 +45,28 @@ func fnEq(env *environment, args expr) (expr, error) {
 	if err := checkArity(args, 2); err != nil {
 		return nil, err
 	}
+	return boolToExpr(nth(0, args) == nth(1, args)), nil
+}
 
-	if nth(0, args) != nth(1, args) {
-		return symNil, nil
+func fnConsp(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, 1); err != nil {
+		return nil, err
 	}
+	return boolToExpr(consp(car(args))), nil
+}
 
-	return symTrue, nil
+func fnListp(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, 1); err != nil {
+		return nil, err
+	}
+	return boolToExpr(listp(car(args))), nil
+}
+
+func fnAtom(env *environment, args expr) (expr, error) {
+	if err := checkArity(args, 1); err != nil {
+		return nil, err
+	}
+	return boolToExpr(atomp(car(args))), nil
 }
 
 func fnCond(env *environment, args expr) (expr, error) {
@@ -139,10 +162,7 @@ func makeNumberCmp(pred func(a, b number) bool) function {
 		if err != nil {
 			return nil, err
 		}
-		if pred(a, b) {
-			return symTrue, nil
-		}
-		return symNil, nil
+		return boolToExpr(pred(a, b)), nil
 	}
 }
 
